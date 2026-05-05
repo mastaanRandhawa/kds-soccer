@@ -119,26 +119,6 @@ After seeding the database:
 - **Match Management**: Create matches, update live scores
 - **Media Management**: Manage homepage gallery images
 
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/auth/login | Admin login |
-| GET | /api/auth/me | Get current user |
-| GET | /api/teams | Get all teams |
-| POST | /api/teams | Create team (auth) |
-| PUT | /api/teams/:id | Update team (auth) |
-| DELETE | /api/teams/:id | Delete team (auth) |
-| GET | /api/matches | Get all matches |
-| GET | /api/matches/live | Get live matches |
-| GET | /api/matches/bracket | Get bracket data |
-| POST | /api/matches | Create match (auth) |
-| PUT | /api/matches/:id | Update match (auth) |
-| PATCH | /api/matches/:id/score | Update score (auth) |
-| GET | /api/media | Get all media |
-| POST | /api/media | Create media (auth) |
-| GET | /api/tournaments/active | Get active tournament |
-
 ## Styling
 
 The website uses a modern, clean design based on the PulseFitHero component style:
