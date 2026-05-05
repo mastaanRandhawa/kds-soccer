@@ -12,6 +12,25 @@ import tournamentRoutes from "./routes/tournaments";
 
 dotenv.config();
 
+/** Browsers send Origin without a path (e.g. github.io/repo → https://USERNAME.github.io). */
+function corsOriginsFromEnv(raw: string | undefined): string | string[] {
+  const fallback = "http://localhost:5173";
+  const entries = (raw ?? fallback)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const normalized = entries.map((entry) => {
+    try {
+      return new URL(entry).origin;
+    } catch {
+      return entry;
+    }
+  });
+  const unique = [...new Set(normalized)];
+  if (unique.length <= 1) return unique[0] ?? fallback;
+  return unique;
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -47,7 +66,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  origin: corsOriginsFromEnv(process.env.CORS_ORIGIN),
   credentials: true,
 }));
 app.use(express.json());
