@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String?  @map("logo_url")
+  location  String?
+  coachName String?  @map("coach_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+
+  @@map("teams")
+}
+
+model Match {
+  id        String      @id @default(cuid())
+  team1Id   String      @map("team_1_id")
+  team2Id   String      @map("team_2_id")
+  score1    Int         @default(0) @map("score_1")
+  score2    Int         @default(0) @map("score_2")
+  round     MatchRound
+  status    MatchStatus @default(SCHEDULED)
+  matchDate DateTime?   @map("match_date")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  team1 Team @relation("HomeTeam", fields: [team1Id], references: [id])
+  team2 Team @relation("AwayTeam", fields: [team2Id], references: [id])
+
+  @@map("matches")
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  imageUrl    String   @map("image_url")
+  description String?
+  category    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("media")
+}
+
+model Tournament {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("tournaments")
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
+enum MatchRound {
+  GROUP_STAGE
+  ROUND_OF_16
+  QUARTERFINAL
+  SEMIFINAL
+  THIRD_PLACE
+  FINAL
+}

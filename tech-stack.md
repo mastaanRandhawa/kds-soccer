@@ -1,0 +1,1 @@
+Typescript, React, Postgress, Swagger, Prisma, Tailwind

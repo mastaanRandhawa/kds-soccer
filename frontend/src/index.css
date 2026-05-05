@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --primary: #1a1a1a;
+  --secondary: #4a5568;
+  --accent: #10B981;
+  --muted: #718096;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
