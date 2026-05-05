@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
@@ -46,8 +46,8 @@ export default function AdminLogin() {
         >
           {/* Logo */}
           <div className="text-center mb-8">
-            <a
-              href="/"
+            <Link
+              to="/"
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 700,
@@ -57,7 +57,7 @@ export default function AdminLogin() {
               }}
             >
               KDS Soccer
-            </a>
+            </Link>
             <h1
               className="mt-4"
               style={{
@@ -179,8 +179,8 @@ export default function AdminLogin() {
 
           {/* Back to Home */}
           <div className="mt-6 text-center">
-            <a
-              href="/"
+            <Link
+              to="/"
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontSize: "14px",
@@ -190,7 +190,7 @@ export default function AdminLogin() {
               className="hover:opacity-70 transition-opacity"
             >
               ← Back to Home
-            </a>
+            </Link>
           </div>
         </div>
       </motion.div>

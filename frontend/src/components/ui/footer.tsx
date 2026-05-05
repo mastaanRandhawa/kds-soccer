@@ -1,5 +1,6 @@
 import React from "react";
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { resolvePublicPath } from "@/lib/public-path";
 
 interface FooterProps {
   logo?: {
@@ -83,7 +84,7 @@ export const Footer = ({
           <div className="flex w-full flex-col justify-between gap-6 lg:items-start lg:max-w-xs">
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
-              <a href={logo.url}>
+              <a href={resolvePublicPath(logo.url)}>
                 <h2 
                   className="text-xl font-bold"
                   style={{
@@ -137,7 +138,7 @@ export const Footer = ({
                       className="font-medium hover:opacity-70 transition-opacity"
                     >
                       <a 
-                        href={link.href}
+                        href={resolvePublicPath(link.href)}
                         style={{
                           fontFamily: "Inter, sans-serif",
                           color: "#4a5568",

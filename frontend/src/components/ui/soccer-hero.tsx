@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { resolvePublicPath } from "@/lib/public-path";
 
 interface NavigationItem {
   label: string;
@@ -88,7 +89,7 @@ export function SoccerHero({
       >
         {/* Logo */}
         <a
-          href="/"
+          href={resolvePublicPath("/")}
           style={{
             fontFamily: "Inter, sans-serif",
             fontWeight: 700,
@@ -105,7 +106,7 @@ export function SoccerHero({
           {navigation.map((item, index) => (
             <a
               key={index}
-              href={item.href}
+              href={item.external ? item.href : resolvePublicPath(item.href || "/")}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
               onClick={item.onClick}

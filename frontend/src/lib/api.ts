@@ -22,7 +22,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/admin/login'
+      window.location.href = `${import.meta.env.BASE_URL}admin/login`
     }
     return Promise.reject(error)
   }
