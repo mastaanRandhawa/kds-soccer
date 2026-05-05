@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/auth";
 import { mediaApi, Media } from "@/lib/api";
-import { ArrowLeft, Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminHeader } from "@/components/ui/admin-header";
 
 export default function AdminMedia() {
   const navigate = useNavigate();
@@ -90,74 +91,19 @@ export default function AdminMedia() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header
-        className="bg-white shadow-sm"
-        style={{ borderBottom: "1px solid #e2e8f0" }}
-      >
-        <div className="container mx-auto px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <Link
-              to="/"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 700,
-                fontSize: "20px",
-                color: "#1a1a1a",
-                textDecoration: "none",
-              }}
-            >
-              KDS Soccer
-            </Link>
-            <span
-              className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{
-                backgroundColor: "#E8F0FF",
-                color: "#3B82F6",
-                fontFamily: "Inter, sans-serif",
-              }}
-            >
-              Admin Panel
-            </span>
-          </div>
+      <AdminHeader user={user} onLogout={handleLogout} />
 
-          <div className="flex items-center gap-4">
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#4a5568",
-              }}
-            >
-              Welcome, {user?.username}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-gray-100"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#718096",
-              }}
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-8 py-12">
+      <main className="container mx-auto px-4 sm:px-8 py-6 sm:py-12">
+        {/* Page title row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-200 transition-colors shrink-0"
             >
               <ArrowLeft size={20} />
             </Link>
@@ -166,7 +112,7 @@ export default function AdminMedia() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 700,
-                  fontSize: "32px",
+                  fontSize: "clamp(20px, 5vw, 32px)",
                   color: "#1a1a1a",
                 }}
               >
@@ -186,7 +132,7 @@ export default function AdminMedia() {
 
           <button
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-6 py-3 rounded-full transition-all hover:scale-105"
+            className="flex items-center gap-2 px-5 py-3 rounded-full transition-all hover:scale-105 self-start sm:self-auto shrink-0"
             style={{
               background: "#1a1a1a",
               fontFamily: "Inter, sans-serif",
@@ -206,7 +152,7 @@ export default function AdminMedia() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {media?.map((item, idx) => (
               <motion.div
                 key={item.id}
@@ -222,7 +168,25 @@ export default function AdminMedia() {
                     alt={item.description || "Media"}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+                  {/* On mobile: always visible action buttons at top-right */}
+                  <div className="absolute top-2 right-2 flex gap-1 sm:hidden">
+                    <button
+                      onClick={() => openModal(item)}
+                      className="p-1.5 rounded-lg bg-white shadow-md"
+                      aria-label="Edit"
+                    >
+                      <Edit2 size={13} style={{ color: "#4a5568" }} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="p-1.5 rounded-lg bg-white shadow-md"
+                      aria-label="Delete"
+                    >
+                      <Trash2 size={13} style={{ color: "#EF4444" }} />
+                    </button>
+                  </div>
+                  {/* On desktop: hover overlay */}
+                  <div className="hidden sm:flex absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all items-center justify-center gap-2 opacity-0 hover:opacity-100">
                     <button
                       onClick={() => openModal(item)}
                       className="p-2 rounded-lg bg-white shadow-md"
@@ -238,10 +202,10 @@ export default function AdminMedia() {
                   </div>
                 </div>
 
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                   {item.category && (
                     <span
-                      className="px-2 py-1 rounded text-xs font-medium"
+                      className="px-2 py-0.5 rounded text-xs font-medium"
                       style={{
                         backgroundColor: "#E8F0FF",
                         color: "#3B82F6",
@@ -253,10 +217,10 @@ export default function AdminMedia() {
                   )}
                   {item.description && (
                     <p
-                      className="mt-2 truncate"
+                      className="mt-1.5 truncate"
                       style={{
                         fontFamily: "Inter, sans-serif",
-                        fontSize: "14px",
+                        fontSize: "13px",
                         color: "#1a1a1a",
                       }}
                     >
@@ -271,19 +235,19 @@ export default function AdminMedia() {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-md w-full"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-t-2xl sm:rounded-2xl p-6 sm:p-8 w-full sm:max-w-md max-h-[90vh] overflow-y-auto"
             >
               <h2
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 600,
-                  fontSize: "24px",
+                  fontSize: "22px",
                   color: "#1a1a1a",
-                  marginBottom: "24px",
+                  marginBottom: "20px",
                 }}
               >
                 {editingMedia ? "Edit Media" : "Add New Media"}
@@ -398,7 +362,7 @@ export default function AdminMedia() {
                   </select>
                 </div>
 
-                <div className="flex gap-4 mt-8">
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}

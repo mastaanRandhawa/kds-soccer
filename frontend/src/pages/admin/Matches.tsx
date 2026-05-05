@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/auth";
 import { matchesApi, teamsApi, Match } from "@/lib/api";
-import { ArrowLeft, Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminHeader } from "@/components/ui/admin-header";
 
 const ROUNDS = [
   "GROUP_STAGE",
@@ -152,74 +153,19 @@ export default function AdminMatches() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header
-        className="bg-white shadow-sm"
-        style={{ borderBottom: "1px solid #e2e8f0" }}
-      >
-        <div className="container mx-auto px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <Link
-              to="/"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 700,
-                fontSize: "20px",
-                color: "#1a1a1a",
-                textDecoration: "none",
-              }}
-            >
-              KDS Soccer
-            </Link>
-            <span
-              className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{
-                backgroundColor: "#E8F0FF",
-                color: "#3B82F6",
-                fontFamily: "Inter, sans-serif",
-              }}
-            >
-              Admin Panel
-            </span>
-          </div>
+      <AdminHeader user={user} onLogout={handleLogout} />
 
-          <div className="flex items-center gap-4">
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#4a5568",
-              }}
-            >
-              Welcome, {user?.username}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-gray-100"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#718096",
-              }}
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-8 py-12">
+      <main className="container mx-auto px-4 sm:px-8 py-6 sm:py-12">
+        {/* Page title row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-200 transition-colors shrink-0"
             >
               <ArrowLeft size={20} />
             </Link>
@@ -228,7 +174,7 @@ export default function AdminMatches() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 700,
-                  fontSize: "32px",
+                  fontSize: "clamp(20px, 5vw, 32px)",
                   color: "#1a1a1a",
                 }}
               >
@@ -248,7 +194,7 @@ export default function AdminMatches() {
 
           <button
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-6 py-3 rounded-full transition-all hover:scale-105"
+            className="flex items-center gap-2 px-5 py-3 rounded-full transition-all hover:scale-105 self-start sm:self-auto shrink-0"
             style={{
               background: "#1a1a1a",
               fontFamily: "Inter, sans-serif",
@@ -268,185 +214,191 @@ export default function AdminMatches() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {matches?.map((match, idx) => (
               <motion.div
                 key={match.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-xl p-6 shadow-sm"
+                className="bg-white rounded-xl p-4 sm:p-6 shadow-sm"
                 style={{ border: "1px solid #e2e8f0" }}
               >
-                <div className="flex items-center justify-between">
-                  {/* Match Info */}
-                  <div className="flex items-center gap-8">
-                    {/* Team 1 */}
-                    <div className="flex items-center gap-4 min-w-[200px]">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: "#E8F0FF" }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "Inter, sans-serif",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {match.team1.name.charAt(0)}
-                        </span>
-                      </div>
+                {/* Teams + score row */}
+                <div className="flex items-center gap-2 mb-3">
+                  {/* Team 1 */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div
+                      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "#E8F0FF" }}
+                    >
                       <span
                         style={{
                           fontFamily: "Inter, sans-serif",
-                          fontWeight: 500,
-                          color: "#1a1a1a",
+                          fontWeight: 600,
+                          fontSize: "12px",
                         }}
                       >
-                        {match.team1.name}
+                        {match.team1.name.charAt(0)}
                       </span>
                     </div>
-
-                    {/* Score Controls */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleQuickScore(match, 1, -1)}
-                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-                        >
-                          -
-                        </button>
-                        <span
-                          style={{
-                            fontFamily: "Inter, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "24px",
-                            color: "#1a1a1a",
-                            minWidth: "40px",
-                            textAlign: "center",
-                          }}
-                        >
-                          {match.score1}
-                        </span>
-                        <button
-                          onClick={() => handleQuickScore(match, 1, 1)}
-                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          color: "#718096",
-                        }}
-                      >
-                        vs
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleQuickScore(match, 2, -1)}
-                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-                        >
-                          -
-                        </button>
-                        <span
-                          style={{
-                            fontFamily: "Inter, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "24px",
-                            color: "#1a1a1a",
-                            minWidth: "40px",
-                            textAlign: "center",
-                          }}
-                        >
-                          {match.score2}
-                        </span>
-                        <button
-                          onClick={() => handleQuickScore(match, 2, 1)}
-                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Team 2 */}
-                    <div className="flex items-center gap-4 min-w-[200px]">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: "#E8F0FF" }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "Inter, sans-serif",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {match.team2.name.charAt(0)}
-                        </span>
-                      </div>
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontWeight: 500,
-                          color: "#1a1a1a",
-                        }}
-                      >
-                        {match.team2.name}
-                      </span>
-                    </div>
+                    <span
+                      className="truncate"
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 500,
+                        fontSize: "14px",
+                        color: "#1a1a1a",
+                      }}
+                    >
+                      {match.team1.name}
+                    </span>
                   </div>
 
-                  {/* Status & Actions */}
-                  <div className="flex items-center gap-4">
-                    <select
-                      value={match.status}
-                      onChange={(e) => handleStatusChange(match, e.target.value)}
-                      className="px-4 py-2 rounded-lg"
+                  {/* Score controls (center) */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => handleQuickScore(match, 1, -1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm leading-none"
+                    >
+                      −
+                    </button>
+                    <span
                       style={{
-                        border: "1px solid #e2e8f0",
                         fontFamily: "Inter, sans-serif",
-                        fontSize: "14px",
-                        backgroundColor:
-                          match.status === "LIVE"
-                            ? "#D1FAE5"
-                            : match.status === "COMPLETED"
-                            ? "#F3F4F6"
-                            : "#DBEAFE",
+                        fontWeight: 700,
+                        fontSize: "20px",
+                        color: "#1a1a1a",
+                        minWidth: "24px",
+                        textAlign: "center",
                       }}
                     >
-                      {STATUSES.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
+                      {match.score1}
+                    </span>
+                    <button
+                      onClick={() => handleQuickScore(match, 1, 1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm leading-none"
+                    >
+                      +
+                    </button>
 
                     <span
-                      className="px-3 py-1 rounded-full text-xs"
                       style={{
-                        backgroundColor: "#F3F4F6",
                         fontFamily: "Inter, sans-serif",
-                        color: "#4a5568",
+                        color: "#718096",
+                        fontSize: "12px",
+                        marginInline: "2px",
                       }}
                     >
-                      {match.round.replace("_", " ")}
+                      vs
                     </span>
 
                     <button
+                      onClick={() => handleQuickScore(match, 2, -1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm leading-none"
+                    >
+                      −
+                    </button>
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "20px",
+                        color: "#1a1a1a",
+                        minWidth: "24px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {match.score2}
+                    </span>
+                    <button
+                      onClick={() => handleQuickScore(match, 2, 1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm leading-none"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Team 2 */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                    <span
+                      className="truncate text-right"
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 500,
+                        fontSize: "14px",
+                        color: "#1a1a1a",
+                      }}
+                    >
+                      {match.team2.name}
+                    </span>
+                    <div
+                      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "#E8F0FF" }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "Inter, sans-serif",
+                          fontWeight: 600,
+                          fontSize: "12px",
+                        }}
+                      >
+                        {match.team2.name.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status + round + actions row */}
+                <div className="flex items-center gap-2 flex-wrap pt-2 border-t" style={{ borderColor: "#f1f5f9" }}>
+                  <select
+                    value={match.status}
+                    onChange={(e) => handleStatusChange(match, e.target.value)}
+                    className="px-3 py-1.5 rounded-lg text-sm"
+                    style={{
+                      border: "1px solid #e2e8f0",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "13px",
+                      backgroundColor:
+                        match.status === "LIVE"
+                          ? "#D1FAE5"
+                          : match.status === "COMPLETED"
+                          ? "#F3F4F6"
+                          : "#DBEAFE",
+                    }}
+                  >
+                    {STATUSES.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+
+                  <span
+                    className="px-2 py-1 rounded-full text-xs whitespace-nowrap"
+                    style={{
+                      backgroundColor: "#F3F4F6",
+                      fontFamily: "Inter, sans-serif",
+                      color: "#4a5568",
+                    }}
+                  >
+                    {match.round.replace(/_/g, " ")}
+                  </span>
+
+                  <div className="flex gap-1 ml-auto">
+                    <button
                       onClick={() => openModal(match)}
                       className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      aria-label="Edit match"
                     >
-                      <Edit2 size={16} style={{ color: "#4a5568" }} />
+                      <Edit2 size={15} style={{ color: "#4a5568" }} />
                     </button>
                     <button
                       onClick={() => handleDelete(match.id)}
                       className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      aria-label="Delete match"
                     >
-                      <Trash2 size={16} style={{ color: "#EF4444" }} />
+                      <Trash2 size={15} style={{ color: "#EF4444" }} />
                     </button>
                   </div>
                 </div>
@@ -457,26 +409,26 @@ export default function AdminMatches() {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-t-2xl sm:rounded-2xl p-6 sm:p-8 w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
             >
               <h2
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 600,
-                  fontSize: "24px",
+                  fontSize: "22px",
                   color: "#1a1a1a",
-                  marginBottom: "24px",
+                  marginBottom: "20px",
                 }}
               >
                 {editingMatch ? "Edit Match" : "Add New Match"}
               </h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
                       style={{
@@ -614,7 +566,7 @@ export default function AdminMatches() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
                       style={{
@@ -643,7 +595,7 @@ export default function AdminMatches() {
                     >
                       {ROUNDS.map((round) => (
                         <option key={round} value={round}>
-                          {round.replace("_", " ")}
+                          {round.replace(/_/g, " ")}
                         </option>
                       ))}
                     </select>
@@ -711,7 +663,7 @@ export default function AdminMatches() {
                   />
                 </div>
 
-                <div className="flex gap-4 mt-8">
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}

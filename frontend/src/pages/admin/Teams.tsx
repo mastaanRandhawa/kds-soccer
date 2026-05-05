@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/auth";
 import { teamsApi, Team } from "@/lib/api";
-import { ArrowLeft, Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminHeader } from "@/components/ui/admin-header";
 
 export default function AdminTeams() {
   const navigate = useNavigate();
@@ -92,74 +93,19 @@ export default function AdminTeams() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header
-        className="bg-white shadow-sm"
-        style={{ borderBottom: "1px solid #e2e8f0" }}
-      >
-        <div className="container mx-auto px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <Link
-              to="/"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 700,
-                fontSize: "20px",
-                color: "#1a1a1a",
-                textDecoration: "none",
-              }}
-            >
-              KDS Soccer
-            </Link>
-            <span
-              className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{
-                backgroundColor: "#E8F0FF",
-                color: "#3B82F6",
-                fontFamily: "Inter, sans-serif",
-              }}
-            >
-              Admin Panel
-            </span>
-          </div>
+      <AdminHeader user={user} onLogout={handleLogout} />
 
-          <div className="flex items-center gap-4">
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#4a5568",
-              }}
-            >
-              Welcome, {user?.username}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-gray-100"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "14px",
-                color: "#718096",
-              }}
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-8 py-12">
+      <main className="container mx-auto px-4 sm:px-8 py-6 sm:py-12">
+        {/* Page title row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-200 transition-colors shrink-0"
             >
               <ArrowLeft size={20} />
             </Link>
@@ -168,7 +114,7 @@ export default function AdminTeams() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 700,
-                  fontSize: "32px",
+                  fontSize: "clamp(20px, 5vw, 32px)",
                   color: "#1a1a1a",
                 }}
               >
@@ -188,7 +134,7 @@ export default function AdminTeams() {
 
           <button
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-6 py-3 rounded-full transition-all hover:scale-105"
+            className="flex items-center gap-2 px-5 py-3 rounded-full transition-all hover:scale-105 self-start sm:self-auto shrink-0"
             style={{
               background: "#1a1a1a",
               fontFamily: "Inter, sans-serif",
@@ -208,33 +154,33 @@ export default function AdminTeams() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {teams?.map((team, idx) => (
               <motion.div
                 key={team.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-xl p-6 shadow-sm"
+                className="bg-white rounded-xl p-5 shadow-sm"
                 style={{ border: "1px solid #e2e8f0" }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                     style={{ backgroundColor: "#E8F0FF" }}
                   >
                     {team.logoUrl ? (
                       <img
                         src={team.logoUrl}
                         alt={team.name}
-                        className="w-14 h-14 rounded-full object-cover"
+                        className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
                       <span
                         style={{
                           fontFamily: "Inter, sans-serif",
                           fontWeight: 700,
-                          fontSize: "24px",
+                          fontSize: "22px",
                           color: "#1a1a1a",
                         }}
                       >
@@ -242,16 +188,18 @@ export default function AdminTeams() {
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => openModal(team)}
                       className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      aria-label="Edit team"
                     >
                       <Edit2 size={16} style={{ color: "#4a5568" }} />
                     </button>
                     <button
                       onClick={() => handleDelete(team.id)}
                       className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      aria-label="Delete team"
                     >
                       <Trash2 size={16} style={{ color: "#EF4444" }} />
                     </button>
@@ -262,9 +210,9 @@ export default function AdminTeams() {
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontWeight: 600,
-                    fontSize: "18px",
+                    fontSize: "17px",
                     color: "#1a1a1a",
-                    marginBottom: "8px",
+                    marginBottom: "6px",
                   }}
                 >
                   {team.name}
@@ -274,12 +222,12 @@ export default function AdminTeams() {
                   <p
                     style={{
                       fontFamily: "Inter, sans-serif",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       color: "#718096",
-                      marginBottom: "4px",
+                      marginBottom: "3px",
                     }}
                   >
-                    Location: {team.location}
+                    📍 {team.location}
                   </p>
                 )}
 
@@ -287,7 +235,7 @@ export default function AdminTeams() {
                   <p
                     style={{
                       fontFamily: "Inter, sans-serif",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       color: "#718096",
                     }}
                   >
@@ -301,19 +249,19 @@ export default function AdminTeams() {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-md w-full"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-t-2xl sm:rounded-2xl p-6 sm:p-8 w-full sm:max-w-md max-h-[90vh] overflow-y-auto"
             >
               <h2
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 600,
-                  fontSize: "24px",
+                  fontSize: "22px",
                   color: "#1a1a1a",
-                  marginBottom: "24px",
+                  marginBottom: "20px",
                 }}
               >
                 {editingTeam ? "Edit Team" : "Add New Team"}
@@ -433,7 +381,7 @@ export default function AdminTeams() {
                   />
                 </div>
 
-                <div className="flex gap-4 mt-8">
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}
