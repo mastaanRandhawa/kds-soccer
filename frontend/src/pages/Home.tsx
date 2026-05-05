@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
-import { MatchCard } from "@/components/ui/match-card";
+import { MatchTable } from "@/components/ui/match-table";
 import { matchesApi, mediaApi, tournamentsApi } from "@/lib/api";
 import { motion } from "framer-motion";
 
@@ -22,15 +22,17 @@ export default function HomePage() {
   const { data: tournament } = useQuery({
     queryKey: ["tournament"],
     queryFn: () => tournamentsApi.getActive(),
+    retry: false,
   });
 
   const liveMatches = matches?.filter((m) => m.status === "LIVE") || [];
-  const upcomingMatches = matches?.filter((m) => m.status === "SCHEDULED").slice(0, 3) || [];
+  const upcomingMatches = matches?.filter((m) => m.status === "SCHEDULED").slice(0, 4) || [];
 
+  // Gallery images for the hero carousel
   const matchCards = media?.slice(0, 5).map((m, idx) => ({
     image: m.imageUrl,
     category: m.category?.toUpperCase() || "TOURNAMENT",
-    title: m.description || `Match Moment ${idx + 1}`,
+    title: m.description || `Highlight ${idx + 1}`,
     onClick: () => {},
   })) || [
     {
@@ -73,7 +75,7 @@ export default function HomePage() {
           { label: "Home", href: "/" },
           { label: "Live Scores", href: "/live-scores" },
           { label: "Bracket", href: "/bracket" },
-          { label: "UFSA Rules", href: "https://ufsa.com", external: true },
+          { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
         ]}
         ctaButton={{
           label: "View Live Scores",
@@ -92,124 +94,92 @@ export default function HomePage() {
           label: "See Bracket",
           onClick: () => navigate("/bracket"),
         }}
-        disclaimer="*Stay updated with real-time match scores"
-        socialProof={{
-          avatars: [
-            "https://i.pravatar.cc/150?img=11",
-            "https://i.pravatar.cc/150?img=12",
-            "https://i.pravatar.cc/150?img=13",
-            "https://i.pravatar.cc/150?img=14",
-          ],
-          text: "Join thousands of fans watching",
-        }}
+        disclaimer="*Auto-refreshing live match scores"
         matches={matchCards}
       />
 
-      {/* Live Matches Section */}
+      {/* Live Matches */}
       {liveMatches.length > 0 && (
         <section
-          className="py-16 lg:py-24"
-          style={{
-            background: "linear-gradient(180deg, #FFFFFF 0%, #F5F9FF 100%)",
-          }}
+          className="py-14 lg:py-20"
+          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F5F9FF 100%)" }}
         >
-          <div className="container mx-auto px-8 lg:px-16">
+          <div className="container mx-auto px-6 lg:px-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="mb-10"
             >
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
                 <h2
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontWeight: 700,
-                    fontSize: "clamp(28px, 4vw, 48px)",
+                    fontSize: "clamp(24px, 3.5vw, 40px)",
                     color: "#1a1a1a",
                   }}
                 >
                   Live Now
                 </h2>
               </div>
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "18px",
-                  color: "#4a5568",
-                }}
-              >
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", color: "#4a5568" }}>
                 Watch the action unfold in real-time
               </p>
             </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {liveMatches.map((match) => (
-                <MatchCard key={match.id} match={match} />
-              ))}
-            </div>
+            <MatchTable matches={liveMatches} />
           </div>
         </section>
       )}
 
-      {/* Upcoming Matches Section */}
+      {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
-        <section className="py-16 lg:py-24 bg-white">
-          <div className="container mx-auto px-8 lg:px-16">
+        <section className="py-14 lg:py-20 bg-white">
+          <div className="container mx-auto px-6 lg:px-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="mb-10"
             >
               <h2
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 700,
-                  fontSize: "clamp(28px, 4vw, 48px)",
+                  fontSize: "clamp(24px, 3.5vw, 40px)",
                   color: "#1a1a1a",
+                  marginBottom: "8px",
                 }}
               >
                 Upcoming Matches
               </h2>
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "18px",
-                  color: "#4a5568",
-                  marginTop: "16px",
-                }}
-              >
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", color: "#4a5568" }}>
                 Don't miss these exciting matchups
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingMatches.map((match) => (
-                <MatchCard key={match.id} match={match} />
-              ))}
-            </div>
+            <MatchTable matches={upcomingMatches} />
 
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-center mt-12"
+              className="mt-10"
             >
               <button
                 onClick={() => navigate("/live-scores")}
-                className="px-8 py-4 rounded-full transition-all hover:scale-105"
+                className="px-8 py-3.5 rounded-full transition-all hover:scale-105"
                 style={{
                   background: "#1a1a1a",
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "16px",
+                  fontSize: "15px",
                   fontWeight: 500,
                   color: "#FFFFFF",
-                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
                 }}
               >
-                View All Matches
+                View All Matches →
               </button>
             </motion.div>
           </div>

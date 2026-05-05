@@ -1,176 +1,188 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
-import { MatchCard } from "@/components/ui/match-card";
+import { MatchTable } from "@/components/ui/match-table";
 import { matchesApi } from "@/lib/api";
 
 type MatchFilter = "all" | "live" | "upcoming" | "completed";
 
+const NAV = [
+  { label: "Home", href: "/" },
+  { label: "Live Scores", href: "/live-scores" },
+  { label: "Bracket", href: "/bracket" },
+  { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
+];
+
 export default function LiveScoresPage() {
   const [filter, setFilter] = useState<MatchFilter>("all");
+  const [roundFilter, setRoundFilter] = useState<string>("all");
 
-  const { data: matches, refetch } = useQuery({
+  const { data: matches, dataUpdatedAt } = useQuery({
     queryKey: ["matches"],
     queryFn: () => matchesApi.getAll(),
-    refetchInterval: 30000,
+    refetchInterval: 30_000,
   });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, 30000);
+  const liveCount = matches?.filter((m) => m.status === "LIVE").length ?? 0;
+  const upcomingCount = matches?.filter((m) => m.status === "SCHEDULED").length ?? 0;
+  const completedCount = matches?.filter((m) => m.status === "COMPLETED").length ?? 0;
 
-    return () => clearInterval(interval);
-  }, [refetch]);
+  // Unique rounds available
+  const allRounds = [...new Set(matches?.map((m) => m.round) ?? [])].sort();
 
-  const filteredMatches = matches?.filter((match) => {
-    switch (filter) {
-      case "live":
-        return match.status === "LIVE";
-      case "upcoming":
-        return match.status === "SCHEDULED";
-      case "completed":
-        return match.status === "COMPLETED";
-      default:
-        return true;
-    }
-  }) || [];
+  const filteredMatches =
+    matches?.filter((match) => {
+      const statusOk =
+        filter === "all"
+          ? true
+          : filter === "live"
+          ? match.status === "LIVE"
+          : filter === "upcoming"
+          ? match.status === "SCHEDULED"
+          : match.status === "COMPLETED";
 
-  const liveCount = matches?.filter((m) => m.status === "LIVE").length || 0;
+      const roundOk = roundFilter === "all" || match.round === roundFilter;
+      return statusOk && roundOk;
+    }) ?? [];
 
-  const filterButtons: { label: string; value: MatchFilter }[] = [
-    { label: "All Matches", value: "all" },
-    { label: `Live (${liveCount})`, value: "live" },
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Completed", value: "completed" },
+  const filterButtons: { label: string; value: MatchFilter; count?: number }[] = [
+    { label: "All", value: "all", count: matches?.length },
+    { label: "Live", value: "live", count: liveCount },
+    { label: "Upcoming", value: "upcoming", count: upcomingCount },
+    { label: "Completed", value: "completed", count: completedCount },
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
+      {/* Compact header-only hero */}
       <SoccerHero
         logo="KDS Soccer"
-        navigation={[
-          { label: "Home", href: "/" },
-          { label: "Live Scores", href: "/live-scores" },
-          { label: "Bracket", href: "/bracket" },
-          { label: "UFSA Rules", href: "https://ufsa.com", external: true },
-        ]}
-        title="Live Scores"
-        subtitle="Stay updated with real-time match scores. Auto-refreshes every 30 seconds."
-        className="min-h-[50vh]"
+        navigation={NAV}
+        title="Match Scores"
+        subtitle="Live and upcoming fixtures — auto-refreshes every 30 seconds"
+        className="min-h-[46vh]"
       >
-        <div className="w-full max-w-6xl mx-auto px-8 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+        <div className="w-full max-w-3xl mx-auto px-6 py-10 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(32px, 5vw, 52px)",
+              color: "#1a1a1a",
+              marginBottom: "12px",
+            }}
           >
-            <h1
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(36px, 6vw, 56px)",
-                color: "#1a1a1a",
-                marginBottom: "16px",
-              }}
-            >
-              Live Scores
-            </h1>
-            <p
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "18px",
-                color: "#4a5568",
-              }}
-            >
-              Stay updated with real-time match scores
-            </p>
-          </motion.div>
+            Match Scores
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            style={{ fontFamily: "Inter, sans-serif", fontSize: "17px", color: "#4a5568" }}
+          >
+            Live and upcoming fixtures
+          </motion.p>
         </div>
       </SoccerHero>
 
-      {/* Filters and Matches */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-8 lg:px-16">
-          {/* Filter Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-wrap justify-center gap-3 mb-12"
-          >
-            {filterButtons.map((btn) => (
-              <button
-                key={btn.value}
-                onClick={() => setFilter(btn.value)}
-                className="px-6 py-3 rounded-full transition-all"
-                style={{
-                  background: filter === btn.value ? "#1a1a1a" : "transparent",
-                  border: "1px solid #e2e8f0",
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: filter === btn.value ? "#FFFFFF" : "#4a5568",
-                }}
-              >
-                {btn.label}
-              </button>
-            ))}
-          </motion.div>
-
-          {/* Auto-refresh indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center gap-2 mb-8"
-          >
-            <span
-              className="inline-block w-2 h-2 rounded-full animate-pulse"
-              style={{ backgroundColor: "#10B981" }}
-            />
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "13px",
-                color: "#718096",
-              }}
-            >
-              Auto-refreshing every 30 seconds
-            </span>
-          </motion.div>
-
-          {/* Matches Grid */}
-          {filteredMatches.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMatches.map((match, idx) => (
-                <motion.div
-                  key={match.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
+      {/* Content */}
+      <section className="py-10 lg:py-16">
+        <div className="container mx-auto px-6 lg:px-16">
+          {/* Filter toolbar */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            {/* Status filter */}
+            <div className="flex flex-wrap gap-2">
+              {filterButtons.map((btn) => (
+                <button
+                  key={btn.value}
+                  onClick={() => setFilter(btn.value)}
+                  className="transition-all hover:scale-105 active:scale-95"
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: "100px",
+                    border: "1.5px solid",
+                    borderColor: filter === btn.value ? "#1a1a1a" : "#e5e7eb",
+                    background: filter === btn.value ? "#1a1a1a" : "transparent",
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    color: filter === btn.value ? "#ffffff" : "#4a5568",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
                 >
-                  <MatchCard match={match} />
-                </motion.div>
+                  {btn.value === "live" && filter !== "live" && liveCount > 0 && (
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10B981", display: "inline-block" }} />
+                  )}
+                  {btn.label}
+                  {btn.count !== undefined && btn.count > 0 && (
+                    <span
+                      style={{
+                        background: filter === btn.value ? "rgba(255,255,255,0.2)" : "#f3f4f6",
+                        color: filter === btn.value ? "#ffffff" : "#6b7280",
+                        borderRadius: "100px",
+                        padding: "1px 7px",
+                        fontSize: "11px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {btn.count}
+                    </span>
+                  )}
+                </button>
               ))}
             </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16"
-            >
-              <p
+
+            {/* Round filter */}
+            {allRounds.length > 1 && (
+              <select
+                value={roundFilter}
+                onChange={(e) => setRoundFilter(e.target.value)}
                 style={{
+                  padding: "8px 14px",
+                  borderRadius: "100px",
+                  border: "1.5px solid #e5e7eb",
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "18px",
-                  color: "#718096",
+                  fontSize: "13px",
+                  color: "#4a5568",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                  appearance: "none",
+                  paddingRight: "32px",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 12px center",
                 }}
               >
-                No matches found for the selected filter.
-              </p>
-            </motion.div>
-          )}
+                <option value="all">All Rounds</option>
+                {allRounds.map((r) => (
+                  <option key={r} value={r}>
+                    {r.replace(/_/g, " ")}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Auto-refresh indicator */}
+          <div className="flex items-center gap-2 mb-6">
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10B981", display: "inline-block", animation: "pulse 1.5s infinite" }} />
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
+              Auto-refreshing · Last updated {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}
+            </span>
+          </div>
+
+          {/* Match table */}
+          <MatchTable
+            matches={filteredMatches}
+            emptyMessage="No matches match the selected filters."
+          />
         </div>
       </section>
 

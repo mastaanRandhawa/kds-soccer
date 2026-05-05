@@ -1,190 +1,143 @@
-import React from "react";
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { resolvePublicPath } from "@/lib/public-path";
 
 interface FooterProps {
-  logo?: {
-    url: string;
-    title: string;
-  };
-  sections?: Array<{
-    title: string;
-    links: Array<{ name: string; href: string }>;
-  }>;
-  description?: string;
-  socialLinks?: Array<{
-    icon: React.ReactElement;
-    href: string;
-    label: string;
-  }>;
   copyright?: string;
-  legalLinks?: Array<{
-    name: string;
-    href: string;
-  }>;
 }
 
-const defaultSections = [
-  {
-    title: "Tournament",
-    links: [
-      { name: "Live Scores", href: "/live-scores" },
-      { name: "Bracket", href: "/bracket" },
-      { name: "Teams", href: "/teams" },
-      { name: "Schedule", href: "/schedule" },
-    ],
-  },
-  {
-    title: "Information",
-    links: [
-      { name: "About", href: "/about" },
-      { name: "Rules", href: "https://ufsa.com" },
-      { name: "Venues", href: "/venues" },
-      { name: "Contact", href: "/contact" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { name: "Help", href: "/help" },
-      { name: "FAQ", href: "/faq" },
-      { name: "Media Kit", href: "/media" },
-      { name: "Sponsors", href: "/sponsors" },
-    ],
-  },
-];
-
-const defaultSocialLinks = [
-  { icon: <FaInstagram className="size-5" />, href: "#", label: "Instagram" },
-  { icon: <FaFacebook className="size-5" />, href: "#", label: "Facebook" },
-  { icon: <FaTwitter className="size-5" />, href: "#", label: "Twitter" },
-  { icon: <FaYoutube className="size-5" />, href: "#", label: "YouTube" },
-];
-
-const defaultLegalLinks = [
-  { name: "Terms and Conditions", href: "#" },
-  { name: "Privacy Policy", href: "#" },
-];
-
 export const Footer = ({
-  logo = {
-    url: "/",
-    title: "KDS Soccer",
-  },
-  sections = defaultSections,
-  description = "The premier soccer tournament bringing together the best teams for an exciting competition.",
-  socialLinks = defaultSocialLinks,
   copyright = "© 2026 KDS Soccer Tournament. All rights reserved.",
-  legalLinks = defaultLegalLinks,
 }: FooterProps) => {
+  const quickLinks = [
+    { name: "Home", href: resolvePublicPath("/") },
+    { name: "Live Scores", href: resolvePublicPath("/live-scores") },
+    { name: "Bracket", href: resolvePublicPath("/bracket") },
+  ];
+
   return (
-    <section className="py-16 lg:py-32 bg-white">
-      <div className="container mx-auto px-8 lg:px-16">
-        <div className="flex w-full flex-col justify-between gap-10 lg:flex-row lg:items-start lg:text-left">
-          <div className="flex w-full flex-col justify-between gap-6 lg:items-start lg:max-w-xs">
-            {/* Logo */}
-            <div className="flex items-center gap-2 lg:justify-start">
-              <a href={resolvePublicPath(logo.url)}>
-                <h2 
-                  className="text-xl font-bold"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    color: "#1a1a1a",
-                  }}
-                >
-                  {logo.title}
-                </h2>
-              </a>
-            </div>
-            <p 
-              className="text-sm"
+    <footer className="bg-white" style={{ borderTop: "1px solid #e2e8f0" }}>
+      <div className="container mx-auto px-8 lg:px-16 py-12">
+        <div className="flex flex-col lg:flex-row justify-between gap-10">
+          {/* Left: Logo + description */}
+          <div className="max-w-xs">
+            <a
+              href={resolvePublicPath("/")}
               style={{
                 fontFamily: "Inter, sans-serif",
-                color: "#718096",
+                fontWeight: 700,
+                fontSize: "20px",
+                color: "#1a1a1a",
+                textDecoration: "none",
+                display: "block",
+                marginBottom: "12px",
               }}
             >
-              {description}
+              KDS Soccer
+            </a>
+            <p
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontSize: "14px",
+                color: "#718096",
+                lineHeight: "1.6",
+              }}
+            >
+              The premier soccer tournament bringing together the best teams for an exciting competition.
             </p>
-            <ul className="flex items-center space-x-6">
-              {socialLinks.map((social, idx) => (
-                <li key={idx} className="hover:opacity-70 transition-opacity">
-                  <a 
-                    href={social.href} 
-                    aria-label={social.label}
-                    style={{ color: "#4a5568" }}
+          </div>
+
+          {/* Center: Quick Links */}
+          <div>
+            <h3
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#1a1a1a",
+                marginBottom: "16px",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
+              Quick Links
+            </h3>
+            <ul className="space-y-3">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "14px",
+                      color: "#4a5568",
+                      textDecoration: "none",
+                    }}
+                    className="hover:opacity-70 transition-opacity"
                   >
-                    {social.icon}
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="grid w-full gap-6 md:grid-cols-3 lg:gap-20">
-            {sections.map((section, sectionIdx) => (
-              <div key={sectionIdx}>
-                <h3 
-                  className="mb-4 font-bold"
+
+          {/* Right: Resources */}
+          <div>
+            <h3
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#1a1a1a",
+                marginBottom: "16px",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
+              Resources
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="https://usfa.ca/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                   style={{
                     fontFamily: "Inter, sans-serif",
-                    color: "#1a1a1a",
+                    fontSize: "14px",
+                    color: "#4a5568",
+                    textDecoration: "none",
                   }}
                 >
-                  {section.title}
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  {section.links.map((link, linkIdx) => (
-                    <li
-                      key={linkIdx}
-                      className="font-medium hover:opacity-70 transition-opacity"
-                    >
-                      <a 
-                        href={resolvePublicPath(link.href)}
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          color: "#4a5568",
-                          textDecoration: "none",
-                        }}
-                      >
-                        {link.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                  UFSA Rules
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-        <div 
-          className="mt-8 flex flex-col justify-between gap-4 border-t py-8 text-xs font-medium md:flex-row md:items-center md:text-left"
-          style={{ borderColor: "#e2e8f0" }}
+
+        {/* Bottom bar */}
+        <div
+          className="mt-10 pt-8 flex items-center justify-center"
+          style={{ borderTop: "1px solid #e2e8f0" }}
         >
-          <p 
-            className="order-2 lg:order-1"
+          <p
             style={{
               fontFamily: "Inter, sans-serif",
+              fontSize: "13px",
               color: "#718096",
+              textAlign: "center",
             }}
           >
             {copyright}
           </p>
-          <ul className="order-1 flex flex-col gap-2 md:order-2 md:flex-row md:gap-4">
-            {legalLinks.map((link, idx) => (
-              <li key={idx} className="hover:opacity-70 transition-opacity">
-                <a 
-                  href={link.href}
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    color: "#718096",
-                    textDecoration: "none",
-                  }}
-                >
-                  {link.name}
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
-    </section>
+    </footer>
   );
 };
