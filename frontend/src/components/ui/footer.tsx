@@ -9,7 +9,8 @@ export const Footer = ({
 }: FooterProps) => {
   const quickLinks = [
     { name: "Home", href: resolvePublicPath("/") },
-    { name: "Live Scores", href: resolvePublicPath("/live-scores") },
+    { name: "Schedule", href: resolvePublicPath("/schedule") },
+    { name: "Standings", href: resolvePublicPath("/standings") },
     { name: "Bracket", href: resolvePublicPath("/bracket") },
   ];
 

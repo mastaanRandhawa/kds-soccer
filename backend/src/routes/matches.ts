@@ -27,21 +27,24 @@ const router = Router();
  */
 router.get("/", async (req, res) => {
   try {
-    const { status, round } = req.query;
+    const { status, round, leagueId } = req.query;
 
     const where: any = {};
     if (status) where.status = status;
     if (round) where.round = round;
+    if (leagueId) where.leagueId = leagueId;
 
     const matches = await prisma.match.findMany({
       where,
       include: {
         team1: true,
         team2: true,
+        league: true,
+        group: true,
       },
       orderBy: [
+        { gameNumber: "asc" },
         { matchDate: "asc" },
-        { round: "asc" },
       ],
     });
 
@@ -92,7 +95,9 @@ router.get("/live", async (req, res) => {
  */
 router.get("/bracket", async (req, res) => {
   try {
+    const { leagueId } = req.query;
     const matches = await prisma.match.findMany({
+      where: leagueId ? { leagueId: leagueId as string } : undefined,
       include: {
         team1: true,
         team2: true,
@@ -101,6 +106,7 @@ router.get("/bracket", async (req, res) => {
     });
 
     const bracket = {
+      roundOf16: matches.filter((m) => m.round === "ROUND_OF_16"),
       quarterfinals: matches.filter((m) => m.round === "QUARTERFINAL"),
       semifinals: matches.filter((m) => m.round === "SEMIFINAL"),
       thirdPlace: matches.filter((m) => m.round === "THIRD_PLACE"),
@@ -188,23 +194,30 @@ router.get("/:id", async (req, res) => {
  */
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { team1Id, team2Id, round, matchDate } = req.body;
+    const {
+      team1Id, team2Id, round, matchDate, leagueId, groupId,
+      gameNumber, field, homePlaceholder, awayPlaceholder, notes, status,
+    } = req.body;
 
-    if (!team1Id || !team2Id || !round) {
-      return res.status(400).json({ error: "team1Id, team2Id, and round are required" });
-    }
+    if (!leagueId) return res.status(400).json({ error: "leagueId is required — every match must belong to a league" });
+    if (!round)    return res.status(400).json({ error: "round is required" });
 
     const match = await prisma.match.create({
       data: {
-        team1Id,
-        team2Id,
+        team1Id:         team1Id   || null,
+        team2Id:         team2Id   || null,
         round,
-        matchDate: matchDate ? new Date(matchDate) : null,
+        status:          status    || "SCHEDULED",
+        matchDate:       matchDate ? new Date(matchDate) : null,
+        leagueId,
+        groupId:         groupId   || null,
+        gameNumber:      gameNumber != null ? Number(gameNumber) : null,
+        field:           field     || null,
+        homePlaceholder: homePlaceholder || null,
+        awayPlaceholder: awayPlaceholder || null,
+        notes:           notes     || null,
       },
-      include: {
-        team1: true,
-        team2: true,
-      },
+      include: { team1: true, team2: true, league: true, group: true },
     });
 
     res.status(201).json(match);
@@ -257,23 +270,34 @@ router.post("/", authenticateToken, requireAdmin, async (req, res) => {
  */
 router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { team1Id, team2Id, score1, score2, round, status, matchDate } = req.body;
+    const {
+      team1Id, team2Id, score1, score2, round, status, matchDate,
+      leagueId, groupId, gameNumber, field, homePlaceholder, awayPlaceholder, notes,
+    } = req.body;
+
+    if (leagueId === null || leagueId === "") {
+      return res.status(400).json({ error: "leagueId cannot be removed — matches must belong to a league" });
+    }
 
     const match = await prisma.match.update({
       where: { id: req.params.id },
       data: {
-        team1Id,
-        team2Id,
+        team1Id:         team1Id !== undefined ? (team1Id || null) : undefined,
+        team2Id:         team2Id !== undefined ? (team2Id || null) : undefined,
         score1,
         score2,
         round,
         status,
-        matchDate: matchDate ? new Date(matchDate) : undefined,
+        matchDate:       matchDate !== undefined ? (matchDate ? new Date(matchDate) : null) : undefined,
+        leagueId:        leagueId  || undefined,
+        groupId:         groupId   !== undefined ? (groupId  || null) : undefined,
+        gameNumber:      gameNumber != null ? Number(gameNumber) : undefined,
+        field:           field     !== undefined ? (field     || null) : undefined,
+        homePlaceholder: homePlaceholder !== undefined ? (homePlaceholder || null) : undefined,
+        awayPlaceholder: awayPlaceholder !== undefined ? (awayPlaceholder || null) : undefined,
+        notes:           notes     !== undefined ? (notes     || null) : undefined,
       },
-      include: {
-        team1: true,
-        team2: true,
-      },
+      include: { team1: true, team2: true, league: true, group: true },
     });
 
     res.json(match);

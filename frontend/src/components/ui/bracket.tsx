@@ -236,11 +236,11 @@ function BracketCard({
                 flexShrink: 0,
               }}
             >
-              {match.team1.logoUrl ? (
+              {match.team1?.logoUrl ? (
                 <img src={match.team1.logoUrl} alt="" style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }} />
               ) : (
                 <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "11px", color: "#1a1a1a" }}>
-                  {match.team1.name.charAt(0)}
+                  {(match.homePlaceholder ?? match.team1?.name ?? "?").charAt(0)}
                 </span>
               )}
             </div>
@@ -249,14 +249,15 @@ function BracketCard({
                 fontFamily: "Inter, sans-serif",
                 fontSize: "13px",
                 fontWeight: team1Wins ? 600 : 400,
-                color: "#1a1a1a",
+                color: match.homePlaceholder ? "#9ca3af" : "#1a1a1a",
+                fontStyle: match.homePlaceholder ? "italic" : "normal",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 maxWidth: "120px",
               }}
             >
-              {match.team1.name}
+              {match.homePlaceholder ?? match.team1?.name ?? "TBD"}
             </span>
           </div>
           <span
@@ -299,11 +300,11 @@ function BracketCard({
                 flexShrink: 0,
               }}
             >
-              {match.team2.logoUrl ? (
+              {match.team2?.logoUrl ? (
                 <img src={match.team2.logoUrl} alt="" style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }} />
               ) : (
                 <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "11px", color: "#1a1a1a" }}>
-                  {match.team2.name.charAt(0)}
+                  {(match.awayPlaceholder ?? match.team2?.name ?? "?").charAt(0)}
                 </span>
               )}
             </div>
@@ -312,14 +313,15 @@ function BracketCard({
                 fontFamily: "Inter, sans-serif",
                 fontSize: "13px",
                 fontWeight: team2Wins ? 600 : 400,
-                color: "#1a1a1a",
+                color: match.awayPlaceholder ? "#9ca3af" : "#1a1a1a",
+                fontStyle: match.awayPlaceholder ? "italic" : "normal",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 maxWidth: "120px",
               }}
             >
-              {match.team2.name}
+              {match.awayPlaceholder ?? match.team2?.name ?? "TBD"}
             </span>
           </div>
           <span

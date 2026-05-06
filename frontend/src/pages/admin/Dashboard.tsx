@@ -2,8 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/auth";
-import { teamsApi, matchesApi, mediaApi } from "@/lib/api";
-import { Users, Calendar, Image, Trophy } from "lucide-react";
+import { teamsApi, matchesApi, mediaApi, leaguesApi } from "@/lib/api";
+import { Users, Calendar, Image, Trophy, Layers } from "lucide-react";
 import { AdminHeader } from "@/components/ui/admin-header";
 
 export default function AdminDashboard() {
@@ -25,6 +25,11 @@ export default function AdminDashboard() {
     queryFn: () => mediaApi.getAll(),
   });
 
+  const { data: leagues } = useQuery({
+    queryKey: ["leagues"],
+    queryFn: () => leaguesApi.getAll(),
+  });
+
   const handleLogout = () => {
     logout();
     navigate("/admin/login");
@@ -42,7 +47,7 @@ export default function AdminDashboard() {
       label: "Matches",
       value: matches?.length || 0,
       icon: Calendar,
-      href: "/admin/matches",
+      href: "/admin/leagues",
       color: "#10B981",
     },
     {
@@ -56,14 +61,22 @@ export default function AdminDashboard() {
       label: "Live Matches",
       value: matches?.filter((m) => m.status === "LIVE").length || 0,
       icon: Trophy,
-      href: "/admin/matches",
+      href: "/admin/leagues",
       color: "#EF4444",
+    },
+    {
+      label: "Leagues",
+      value: leagues?.length || 0,
+      icon: Layers,
+      href: "/admin/leagues",
+      color: "#8B5CF6",
     },
   ];
 
   const quickLinks = [
     { label: "Manage Teams", href: "/admin/teams", icon: Users },
-    { label: "Manage Matches", href: "/admin/matches", icon: Calendar },
+    { label: "Manage Matches", href: "/admin/leagues", icon: Calendar },
+    { label: "Manage Leagues", href: "/admin/leagues", icon: Layers },
     { label: "Manage Media", href: "/admin/media", icon: Image },
   ];
 
@@ -100,7 +113,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 sm:mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8 sm:mb-12">
           {stats.map((stat, idx) => (
             <motion.div
               key={stat.label}
@@ -165,7 +178,7 @@ export default function AdminDashboard() {
           >
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickLinks.map((link) => (
               <Link
                 key={link.label}
@@ -291,7 +304,7 @@ export default function AdminDashboard() {
                               color: "#1a1a1a",
                             }}
                           >
-                            {match.team1.name} vs {match.team2.name}
+                            {match.homePlaceholder ?? match.team1?.name ?? 'TBD'} vs {match.awayPlaceholder ?? match.team2?.name ?? 'TBD'}
                           </span>
                         </td>
                         <td className="px-4 sm:px-6 py-4 text-center">

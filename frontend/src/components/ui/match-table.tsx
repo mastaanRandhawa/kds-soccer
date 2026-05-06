@@ -70,7 +70,7 @@ function RoundBadge({ round }: { round: string }) {
   );
 }
 
-function TeamCell({ name, logoUrl, isWinner }: { name: string; logoUrl?: string; isWinner?: boolean }) {
+function TeamCell({ name, logoUrl, isWinner, italic }: { name: string; logoUrl?: string; isWinner?: boolean; italic?: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <div
@@ -98,13 +98,26 @@ function TeamCell({ name, logoUrl, isWinner }: { name: string; logoUrl?: string;
           fontFamily: "Inter, sans-serif",
           fontSize: "14px",
           fontWeight: isWinner ? 600 : 400,
-          color: "#1a1a1a",
+          color: italic ? "#9ca3af" : "#1a1a1a",
+          fontStyle: italic ? "italic" : "normal",
         }}
       >
         {name}
       </span>
     </div>
   );
+}
+
+/** Safe name that falls back to placeholder text then "TBD" */
+function resolveTeamName(match: Match, side: "home" | "away"): string {
+  if (side === "home") return match.homePlaceholder ?? match.team1?.name ?? "TBD";
+  return match.awayPlaceholder ?? match.team2?.name ?? "TBD";
+}
+function resolveLogoUrl(match: Match, side: "home" | "away"): string | undefined {
+  return side === "home" ? match.team1?.logoUrl : match.team2?.logoUrl;
+}
+function isPlaceholderTeam(match: Match, side: "home" | "away"): boolean {
+  return side === "home" ? !!match.homePlaceholder : !!match.awayPlaceholder;
 }
 
 // Desktop table row
@@ -115,14 +128,17 @@ function DesktopRow({ match, idx }: { match: Match; idx: number }) {
   const team1Wins = isCompleted && match.score1 > match.score2;
   const team2Wins = isCompleted && match.score2 > match.score1;
 
+  const home1 = resolveTeamName(match, "home");
+  const home2 = resolveTeamName(match, "away");
+  const logo1 = resolveLogoUrl(match, "home");
+  const logo2 = resolveLogoUrl(match, "away");
+
   return (
     <motion.tr
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: idx * 0.04 }}
-      style={{
-        borderBottom: "1px solid #f3f4f6",
-      }}
+      style={{ borderBottom: "1px solid #f3f4f6" }}
       className="hover:bg-gray-50 transition-colors"
     >
       {/* Date */}
@@ -143,7 +159,7 @@ function DesktopRow({ match, idx }: { match: Match; idx: number }) {
 
       {/* Home team */}
       <td style={{ padding: "14px 16px" }}>
-        <TeamCell name={match.team1.name} logoUrl={match.team1.logoUrl} isWinner={team1Wins} />
+        <TeamCell name={home1} logoUrl={logo1} isWinner={team1Wins} italic={isPlaceholderTeam(match, "home")} />
       </td>
 
       {/* Score */}
@@ -159,7 +175,7 @@ function DesktopRow({ match, idx }: { match: Match; idx: number }) {
 
       {/* Away team */}
       <td style={{ padding: "14px 16px" }}>
-        <TeamCell name={match.team2.name} logoUrl={match.team2.logoUrl} isWinner={team2Wins} />
+        <TeamCell name={home2} logoUrl={logo2} isWinner={team2Wins} italic={isPlaceholderTeam(match, "away")} />
       </td>
 
       {/* Round */}
@@ -182,6 +198,11 @@ function MobileCard({ match, idx }: { match: Match; idx: number }) {
   const showScore = isCompleted || isLive;
   const team1Wins = isCompleted && match.score1 > match.score2;
   const team2Wins = isCompleted && match.score2 > match.score1;
+
+  const home1 = resolveTeamName(match, "home");
+  const home2 = resolveTeamName(match, "away");
+  const logo1 = resolveLogoUrl(match, "home");
+  const logo2 = resolveLogoUrl(match, "away");
 
   return (
     <motion.div
@@ -236,7 +257,7 @@ function MobileCard({ match, idx }: { match: Match; idx: number }) {
             marginBottom: "4px",
           }}
         >
-          <TeamCell name={match.team1.name} logoUrl={match.team1.logoUrl} isWinner={team1Wins} />
+          <TeamCell name={home1} logoUrl={logo1} isWinner={team1Wins} italic={isPlaceholderTeam(match, "home")} />
           <span style={{ fontFamily: "Inter, sans-serif", fontSize: "22px", fontWeight: 700, color: team1Wins ? "#1a1a1a" : isCompleted ? "#9ca3af" : "#1a1a1a" }}>
             {showScore ? match.score1 : "–"}
           </span>
@@ -253,7 +274,7 @@ function MobileCard({ match, idx }: { match: Match; idx: number }) {
             backgroundColor: team2Wins ? "#eff6ff" : "transparent",
           }}
         >
-          <TeamCell name={match.team2.name} logoUrl={match.team2.logoUrl} isWinner={team2Wins} />
+          <TeamCell name={home2} logoUrl={logo2} isWinner={team2Wins} italic={isPlaceholderTeam(match, "away")} />
           <span style={{ fontFamily: "Inter, sans-serif", fontSize: "22px", fontWeight: 700, color: team2Wins ? "#1a1a1a" : isCompleted ? "#9ca3af" : "#1a1a1a" }}>
             {showScore ? match.score2 : "–"}
           </span>

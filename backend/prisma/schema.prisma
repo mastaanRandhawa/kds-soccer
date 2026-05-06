@@ -33,20 +33,58 @@ model Team {
   @@map("teams")
 }
 
-model Match {
-  id        String      @id @default(cuid())
-  team1Id   String      @map("team_1_id")
-  team2Id   String      @map("team_2_id")
-  score1    Int         @default(0) @map("score_1")
-  score2    Int         @default(0) @map("score_2")
-  round     MatchRound
-  status    MatchStatus @default(SCHEDULED)
-  matchDate DateTime?   @map("match_date")
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+model League {
+  id           String      @id @default(cuid())
+  name         String
+  division     String?
+  notes        String?
+  sortOrder    Int         @default(0) @map("sort_order")
+  tournamentId String?     @map("tournament_id")
+  tournament   Tournament? @relation(fields: [tournamentId], references: [id], onDelete: SetNull)
+  matches      Match[]
+  groups       Group[]
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
 
-  team1 Team @relation("HomeTeam", fields: [team1Id], references: [id])
-  team2 Team @relation("AwayTeam", fields: [team2Id], references: [id])
+  @@map("leagues")
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  leagueId  String   @map("league_id")
+  name      String
+  sortOrder Int      @default(0) @map("sort_order")
+  league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  matches   Match[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("groups")
+}
+
+model Match {
+  id              String      @id @default(cuid())
+  gameNumber      Int?        @map("game_number")
+  team1Id         String?     @map("team_1_id")
+  team2Id         String?     @map("team_2_id")
+  score1          Int         @default(0) @map("score_1")
+  score2          Int         @default(0) @map("score_2")
+  round           MatchRound
+  status          MatchStatus @default(SCHEDULED)
+  matchDate       DateTime?   @map("match_date")
+  field           String?
+  homePlaceholder String?     @map("home_placeholder")
+  awayPlaceholder String?     @map("away_placeholder")
+  notes           String?
+  leagueId        String      @map("league_id")
+  groupId         String?     @map("group_id")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  team1  Team?   @relation("HomeTeam", fields: [team1Id], references: [id])
+  team2  Team?   @relation("AwayTeam", fields: [team2Id], references: [id])
+  league League  @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  group  Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@map("matches")
 }
@@ -63,14 +101,16 @@ model Media {
 }
 
 model Tournament {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
   startDate   DateTime? @map("start_date")
   endDate     DateTime? @map("end_date")
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  leagues League[]
 
   @@map("tournaments")
 }

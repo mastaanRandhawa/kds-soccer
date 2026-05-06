@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/auth";
 import { matchesApi, teamsApi, Match } from "@/lib/api";
 import { ArrowLeft, Plus, Edit2, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/ui/admin-header";
+import { leaguesApi } from "@/lib/api";
 
 const ROUNDS = [
   "GROUP_STAGE",
@@ -32,6 +33,7 @@ export default function AdminMatches() {
     round: "QUARTERFINAL",
     status: "SCHEDULED",
     matchDate: "",
+    leagueId: "",
   });
 
   const { data: matches, isLoading } = useQuery({
@@ -42,6 +44,11 @@ export default function AdminMatches() {
   const { data: teams } = useQuery({
     queryKey: ["teams"],
     queryFn: () => teamsApi.getAll(),
+  });
+
+  const { data: leagues } = useQuery({
+    queryKey: ["leagues"],
+    queryFn: () => leaguesApi.getAll(),
   });
 
   const createMutation = useMutation({
@@ -94,6 +101,7 @@ export default function AdminMatches() {
         matchDate: match.matchDate
           ? new Date(match.matchDate).toISOString().slice(0, 16)
           : "",
+        leagueId: match.leagueId ?? "",
       });
     } else {
       setEditingMatch(null);
@@ -105,6 +113,7 @@ export default function AdminMatches() {
         round: "QUARTERFINAL",
         status: "SCHEDULED",
         matchDate: "",
+        leagueId: "",
       });
     }
     setIsModalOpen(true);
@@ -232,14 +241,8 @@ export default function AdminMatches() {
                       className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: "#E8F0FF" }}
                     >
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "12px",
-                        }}
-                      >
-                        {match.team1.name.charAt(0)}
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px" }}>
+                        {(match.homePlaceholder ?? match.team1?.name ?? "?").charAt(0)}
                       </span>
                     </div>
                     <span
@@ -248,10 +251,11 @@ export default function AdminMatches() {
                         fontFamily: "Inter, sans-serif",
                         fontWeight: 500,
                         fontSize: "14px",
-                        color: "#1a1a1a",
+                        color: match.homePlaceholder ? "#9ca3af" : "#1a1a1a",
+                        fontStyle: match.homePlaceholder ? "italic" : "normal",
                       }}
                     >
-                      {match.team1.name}
+                      {match.homePlaceholder ?? match.team1?.name ?? "TBD"}
                     </span>
                   </div>
 
@@ -327,23 +331,18 @@ export default function AdminMatches() {
                         fontFamily: "Inter, sans-serif",
                         fontWeight: 500,
                         fontSize: "14px",
-                        color: "#1a1a1a",
+                        color: match.awayPlaceholder ? "#9ca3af" : "#1a1a1a",
+                        fontStyle: match.awayPlaceholder ? "italic" : "normal",
                       }}
                     >
-                      {match.team2.name}
+                      {match.awayPlaceholder ?? match.team2?.name ?? "TBD"}
                     </span>
                     <div
                       className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: "#E8F0FF" }}
                     >
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "12px",
-                        }}
-                      >
-                        {match.team2.name.charAt(0)}
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px" }}>
+                        {(match.awayPlaceholder ?? match.team2?.name ?? "?").charAt(0)}
                       </span>
                     </div>
                   </div>
@@ -376,14 +375,18 @@ export default function AdminMatches() {
 
                   <span
                     className="px-2 py-1 rounded-full text-xs whitespace-nowrap"
-                    style={{
-                      backgroundColor: "#F3F4F6",
-                      fontFamily: "Inter, sans-serif",
-                      color: "#4a5568",
-                    }}
+                    style={{ backgroundColor: "#F3F4F6", fontFamily: "Inter, sans-serif", color: "#4a5568" }}
                   >
                     {match.round.replace(/_/g, " ")}
                   </span>
+                  {match.league && (
+                    <span
+                      className="px-2 py-1 rounded-full text-xs whitespace-nowrap"
+                      style={{ backgroundColor: "#EDE9FE", fontFamily: "Inter, sans-serif", color: "#7C3AED" }}
+                    >
+                      {match.league.name}
+                    </span>
+                  )}
 
                   <div className="flex gap-1 ml-auto">
                     <button
@@ -661,6 +664,34 @@ export default function AdminMatches() {
                       fontSize: "14px",
                     }}
                   />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: "#1a1a1a",
+                      display: "block",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    League / Division
+                  </label>
+                  <select
+                    value={formData.leagueId}
+                    onChange={(e) => setFormData({ ...formData, leagueId: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{ border: "1px solid #e2e8f0", fontFamily: "Inter, sans-serif", fontSize: "14px" }}
+                  >
+                    <option value="">— No league —</option>
+                    {leagues?.map((league) => (
+                      <option key={league.id} value={league.id}>
+                        {league.name}{league.division ? ` (${league.division})` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex gap-3 pt-4">

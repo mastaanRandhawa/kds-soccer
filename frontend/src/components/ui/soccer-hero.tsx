@@ -45,7 +45,8 @@ export function SoccerHero({
   logo = "KDS Soccer",
   navigation = [
     { label: "Home", href: "/" },
-    { label: "Live Scores", href: "/live-scores" },
+    { label: "Schedule", href: "/schedule" },
+    { label: "Standings", href: "/standings" },
     { label: "Bracket", href: "/bracket" },
     { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
   ],

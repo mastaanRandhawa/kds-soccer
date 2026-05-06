@@ -73,21 +73,15 @@ export function MatchCard({ match, showDate = true }: MatchCardProps) {
               className="w-10 h-10 rounded-full flex items-center justify-center"
               style={{ backgroundColor: "#E8F0FF" }}
             >
-              {match.team1.logoUrl ? (
+              {match.team1?.logoUrl ? (
                 <img
                   src={match.team1.logoUrl}
-                  alt={match.team1.name}
+                  alt={match.team1?.name}
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 600,
-                    color: "#1a1a1a",
-                  }}
-                >
-                  {match.team1.name.charAt(0)}
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, color: "#1a1a1a" }}>
+                  {(match.homePlaceholder ?? match.team1?.name ?? "?").charAt(0)}
                 </span>
               )}
             </div>
@@ -95,10 +89,11 @@ export function MatchCard({ match, showDate = true }: MatchCardProps) {
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,
-                color: "#1a1a1a",
+                color: match.homePlaceholder ? "#9ca3af" : "#1a1a1a",
+                fontStyle: match.homePlaceholder ? "italic" : "normal",
               }}
             >
-              {match.team1.name}
+              {match.homePlaceholder ?? match.team1?.name ?? "TBD"}
             </span>
           </div>
           <span
@@ -126,21 +121,15 @@ export function MatchCard({ match, showDate = true }: MatchCardProps) {
               className="w-10 h-10 rounded-full flex items-center justify-center"
               style={{ backgroundColor: "#E8F0FF" }}
             >
-              {match.team2.logoUrl ? (
+              {match.team2?.logoUrl ? (
                 <img
                   src={match.team2.logoUrl}
-                  alt={match.team2.name}
+                  alt={match.team2?.name}
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 600,
-                    color: "#1a1a1a",
-                  }}
-                >
-                  {match.team2.name.charAt(0)}
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, color: "#1a1a1a" }}>
+                  {(match.awayPlaceholder ?? match.team2?.name ?? "?").charAt(0)}
                 </span>
               )}
             </div>
@@ -148,10 +137,11 @@ export function MatchCard({ match, showDate = true }: MatchCardProps) {
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,
-                color: "#1a1a1a",
+                color: match.awayPlaceholder ? "#9ca3af" : "#1a1a1a",
+                fontStyle: match.awayPlaceholder ? "italic" : "normal",
               }}
             >
-              {match.team2.name}
+              {match.awayPlaceholder ?? match.team2?.name ?? "TBD"}
             </span>
           </div>
           <span

@@ -73,28 +73,29 @@ export default function HomePage() {
         logo="KDS Soccer"
         navigation={[
           { label: "Home", href: "/" },
-          { label: "Live Scores", href: "/live-scores" },
+          { label: "Schedule", href: "/schedule" },
+          { label: "Standings", href: "/standings" },
           { label: "Bracket", href: "/bracket" },
           { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
         ]}
         ctaButton={{
-          label: "View Live Scores",
-          onClick: () => navigate("/live-scores"),
+          label: "View Schedule",
+          onClick: () => navigate("/schedule"),
         }}
         title={tournament?.name || "KDS Soccer Championship 2026"}
         subtitle={
           tournament?.description ||
-          "Experience the thrill of competition as top teams battle for glory. Live scores, real-time brackets, and all the action you need."
+          "Experience the thrill of competition as top teams battle for glory. Full schedule, standings, and brackets — all in one place."
         }
         primaryAction={{
-          label: "View Live Scores",
-          onClick: () => navigate("/live-scores"),
+          label: "View Schedule",
+          onClick: () => navigate("/schedule"),
         }}
         secondaryAction={{
           label: "See Bracket",
           onClick: () => navigate("/bracket"),
         }}
-        disclaimer="*Auto-refreshing live match scores"
+        disclaimer="*Scores updated in real-time"
         matches={matchCards}
       />
 
@@ -168,7 +169,7 @@ export default function HomePage() {
               className="mt-10"
             >
               <button
-                onClick={() => navigate("/live-scores")}
+                onClick={() => navigate("/schedule")}
                 className="px-8 py-3.5 rounded-full transition-all hover:scale-105"
                 style={{
                   background: "#1a1a1a",
@@ -179,7 +180,7 @@ export default function HomePage() {
                   boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
                 }}
               >
-                View All Matches →
+                View Full Schedule →
               </button>
             </motion.div>
           </div>

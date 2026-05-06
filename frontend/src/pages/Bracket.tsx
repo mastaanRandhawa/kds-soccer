@@ -5,11 +5,12 @@ import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
 import { Bracket as BracketView } from "@/components/ui/bracket";
 import { MatchTable } from "@/components/ui/match-table";
-import { matchesApi } from "@/lib/api";
+import { matchesApi, leaguesApi, League } from "@/lib/api";
 
 const NAV = [
   { label: "Home", href: "/" },
   { label: "Live Scores", href: "/live-scores" },
+  { label: "Standings", href: "/standings" },
   { label: "Bracket", href: "/bracket" },
   { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
 ];
@@ -18,16 +19,31 @@ type ViewMode = "bracket" | "table";
 
 export default function BracketPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("bracket");
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
+
+  const { data: leagues } = useQuery({
+    queryKey: ["leagues"],
+    queryFn: () => leaguesApi.getAll(),
+  });
+
+  const activeLeague: League | null =
+    selectedLeagueId
+      ? (leagues?.find((l) => l.id === selectedLeagueId) ?? null)
+      : (leagues?.[0] ?? null);
 
   const { data: bracket, isLoading: bracketLoading } = useQuery({
-    queryKey: ["bracket"],
-    queryFn: () => matchesApi.getBracket(),
+    queryKey: ["bracket", activeLeague?.id],
+    queryFn: () =>
+      activeLeague
+        ? leaguesApi.getBracket(activeLeague.id)
+        : matchesApi.getBracket(),
     refetchInterval: 30_000,
   });
 
   const { data: allMatches, isLoading: matchesLoading } = useQuery({
-    queryKey: ["matches"],
-    queryFn: () => matchesApi.getAll(),
+    queryKey: ["matches", activeLeague?.id],
+    queryFn: () =>
+      matchesApi.getAll(activeLeague ? { leagueId: activeLeague.id } : undefined),
     refetchInterval: 30_000,
   });
 
@@ -69,8 +85,60 @@ export default function BracketPage() {
 
       <section className="py-10 lg:py-16">
         <div className="container mx-auto px-6 lg:px-16">
+
+          {/* League selector */}
+          {leagues && leagues.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                onClick={() => setSelectedLeagueId(null)}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: "100px",
+                  border: "1.5px solid",
+                  borderColor: !selectedLeagueId && !activeLeague ? "#1a1a1a" : "#e5e7eb",
+                  background: !selectedLeagueId && !activeLeague ? "#1a1a1a" : "transparent",
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: !selectedLeagueId && !activeLeague ? "#ffffff" : "#4a5568",
+                  cursor: "pointer",
+                }}
+              >
+                All
+              </button>
+              {leagues.map((league) => {
+                const active = (selectedLeagueId ?? leagues[0]?.id) === league.id;
+                return (
+                  <button
+                    key={league.id}
+                    onClick={() => setSelectedLeagueId(league.id)}
+                    style={{
+                      padding: "6px 16px",
+                      borderRadius: "100px",
+                      border: "1.5px solid",
+                      borderColor: active ? "#1a1a1a" : "#e5e7eb",
+                      background: active ? "#1a1a1a" : "transparent",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: active ? "#ffffff" : "#4a5568",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {league.name}
+                    {league.division && (
+                      <span style={{ opacity: 0.7, marginLeft: "5px", fontSize: "11px" }}>
+                        {league.division}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* View toggle */}
-          <div className="flex items-center gap-3 mb-10">
+          <div className="flex items-center gap-3 mb-8">
             {(["bracket", "table"] as ViewMode[]).map((mode) => (
               <button
                 key={mode}
@@ -94,7 +162,6 @@ export default function BracketPage() {
               </button>
             ))}
 
-            {/* Live indicator */}
             <div className="ml-auto flex items-center gap-2">
               <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10B981", display: "inline-block", animation: "pulse 1.5s infinite" }} />
               <span style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
@@ -110,7 +177,7 @@ export default function BracketPage() {
           ) : viewMode === "bracket" ? (
             <>
               {bracket ? (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.div key={activeLeague?.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <BracketView
                     quarterfinals={bracket.quarterfinals ?? []}
                     semifinals={bracket.semifinals ?? []}
@@ -124,7 +191,6 @@ export default function BracketPage() {
                 </p>
               )}
 
-              {/* Legend */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -144,7 +210,7 @@ export default function BracketPage() {
               </motion.div>
             </>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div key={activeLeague?.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <MatchTable
                 matches={allMatches ?? []}
                 emptyMessage="No matches available yet."

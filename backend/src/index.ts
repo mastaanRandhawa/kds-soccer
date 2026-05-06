@@ -9,6 +9,8 @@ import teamRoutes from "./routes/teams";
 import matchRoutes from "./routes/matches";
 import mediaRoutes from "./routes/media";
 import tournamentRoutes from "./routes/tournaments";
+import leagueRoutes from "./routes/leagues";
+import groupRoutes from "./routes/groups";
 
 dotenv.config();
 
@@ -81,6 +83,8 @@ app.use("/api/teams", teamRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/tournaments", tournamentRoutes);
+app.use("/api/leagues", leagueRoutes);
+app.use("/api/groups", groupRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
