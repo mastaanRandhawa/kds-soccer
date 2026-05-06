@@ -31,14 +31,6 @@ function isPlaceholder(match: Match, side: 'home' | 'away') {
   return side === 'home' ? !!match.homePlaceholder : !!match.awayPlaceholder
 }
 
-const ROUND_LABEL: Record<string, string> = {
-  GROUP_STAGE: 'Group Stage',
-  ROUND_OF_16: 'Round of 16',
-  QUARTERFINAL: 'Quarter Final',
-  SEMIFINAL: 'Semi Final',
-  THIRD_PLACE: 'Third Place',
-  FINAL: 'Final',
-}
 
 const STATUS_META: Record<string, { label: string; color: string; dot: string }> = {
   SCHEDULED: { label: 'Upcoming', color: 'bg-slate-100 text-slate-600',   dot: 'bg-slate-400' },

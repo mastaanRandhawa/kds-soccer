@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/auth";
 import { leaguesApi, matchesApi, groupsApi, teamsApi, Match, Group } from "@/lib/api";
 import {
   ArrowLeft, Plus, Edit2, Trash2, Trophy, ChevronDown, ChevronUp,
-  Layers, Calendar, Users, Edit3, X, Check, Zap, AlertCircle,
+  Layers, Calendar, Users, X, Zap, AlertCircle,
 } from "lucide-react";
 import { AdminHeader } from "@/components/ui/admin-header";
 
@@ -176,7 +176,6 @@ function MatchRow({
 }) {
   const home = match.homePlaceholder ?? match.team1?.name ?? "TBD";
   const away = match.awayPlaceholder ?? match.team2?.name ?? "TBD";
-  const isPlaceholder = (t: string) => !match.team1Id || !match.team2Id;
   const statusInfo = STATUSES.find((s) => s.value === match.status) ?? STATUSES[0];
 
   const dateStr = match.matchDate
@@ -472,16 +471,6 @@ export default function AdminLeagueDetail() {
     },
   });
 
-  const deleteGroup = useMutation({
-    mutationFn: (groupId: string) => groupsApi.delete(groupId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["league", id] }),
-  });
-
-  const editLeague = useMutation({
-    mutationFn: (data: { name: string; division: string; notes: string }) =>
-      leaguesApi.update(id!, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["league", id] }),
-  });
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
 

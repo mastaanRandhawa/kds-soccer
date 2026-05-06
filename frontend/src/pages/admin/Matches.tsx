@@ -92,8 +92,8 @@ export default function AdminMatches() {
     if (match) {
       setEditingMatch(match);
       setFormData({
-        team1Id: match.team1Id,
-        team2Id: match.team2Id,
+        team1Id: match.team1Id ?? "",
+        team2Id: match.team2Id ?? "",
         score1: match.score1,
         score2: match.score2,
         round: match.round,
