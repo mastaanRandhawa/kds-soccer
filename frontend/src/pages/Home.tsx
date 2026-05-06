@@ -101,33 +101,21 @@ export default function HomePage() {
 
       {/* Live Matches */}
       {liveMatches.length > 0 && (
-        <section
-          className="py-14 lg:py-20"
-          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F5F9FF 100%)" }}
-        >
-          <div className="container mx-auto px-6 lg:px-16">
+        <section className="py-12 lg:py-16 bg-gray-950">
+          <div className="max-w-5xl mx-auto px-6 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-10"
+              className="mb-8"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-                <h2
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "clamp(24px, 3.5vw, 40px)",
-                    color: "#1a1a1a",
-                  }}
-                >
-                  Live Now
-                </h2>
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-widest text-green-400">Live now</span>
               </div>
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", color: "#4a5568" }}>
-                Watch the action unfold in real-time
-              </p>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                Matches in Progress
+              </h2>
             </motion.div>
             <MatchTable matches={liveMatches} />
           </div>
@@ -136,53 +124,30 @@ export default function HomePage() {
 
       {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
-        <section className="py-14 lg:py-20 bg-white">
-          <div className="container mx-auto px-6 lg:px-16">
+        <section className="py-12 lg:py-16 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-6 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-10"
+              className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
             >
-              <h2
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(24px, 3.5vw, 40px)",
-                  color: "#1a1a1a",
-                  marginBottom: "8px",
-                }}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Schedule</p>
+                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+                  Upcoming Matches
+                </h2>
+              </div>
+              <button
+                onClick={() => navigate("/schedule")}
+                className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:opacity-90 hover:scale-105 transition-all"
+                style={{ background: "#1a1a1a", boxShadow: "0 4px 16px rgba(0,0,0,0.15)" }}
               >
-                Upcoming Matches
-              </h2>
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", color: "#4a5568" }}>
-                Don't miss these exciting matchups
-              </p>
+                Full Schedule →
+              </button>
             </motion.div>
 
             <MatchTable matches={upcomingMatches} />
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="mt-10"
-            >
-              <button
-                onClick={() => navigate("/schedule")}
-                className="px-8 py-3.5 rounded-full transition-all hover:scale-105"
-                style={{
-                  background: "#1a1a1a",
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  color: "#FFFFFF",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-                }}
-              >
-                View Full Schedule →
-              </button>
-            </motion.div>
           </div>
         </section>
       )}

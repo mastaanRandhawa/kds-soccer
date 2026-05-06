@@ -1,61 +1,55 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
 import { leaguesApi, StandingRow, League } from "@/lib/api";
+import { RefreshCw } from "lucide-react";
 
-const NAV = [
-  { label: "Home", href: "/" },
-  { label: "Schedule", href: "/schedule" },
-  { label: "Standings", href: "/standings" },
-  { label: "Bracket", href: "/bracket" },
-  { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
+// ─── Column definitions ──────────────────────────────────────────────────────
+
+const COLS: { key: keyof StandingRow; label: string; title: string; hide?: boolean }[] = [
+  { key: "gp",  label: "GP",  title: "Games Played" },
+  { key: "w",   label: "W",   title: "Wins" },
+  { key: "d",   label: "D",   title: "Draws" },
+  { key: "l",   label: "L",   title: "Losses" },
+  { key: "gf",  label: "GF",  title: "Goals For",       hide: true },
+  { key: "ga",  label: "GA",  title: "Goals Against",   hide: true },
+  { key: "gd",  label: "GD",  title: "Goal Difference" },
+  { key: "pts", label: "PTS", title: "Points" },
 ];
+
+const POSITION_STYLE = [
+  { ring: "#F59E0B", bg: "bg-amber-50",  text: "text-amber-700",  badge: "bg-amber-100 text-amber-700" },
+  { ring: "#9CA3AF", bg: "bg-gray-50",   text: "text-gray-600",   badge: "bg-gray-100  text-gray-600" },
+  { ring: "#D97706", bg: "bg-orange-50", text: "text-orange-600", badge: "bg-orange-50 text-orange-600" },
+];
+
+// ─── Standings table ─────────────────────────────────────────────────────────
 
 function StandingsTable({ rows }: { rows: StandingRow[] }) {
   if (rows.length === 0) {
     return (
-      <p style={{ fontFamily: "Inter, sans-serif", color: "#9ca3af", textAlign: "center", padding: "40px 0" }}>
-        No completed matches yet — standings will appear here once results are recorded.
-      </p>
+      <div className="text-center py-16 border-2 border-dashed border-gray-100 rounded-2xl">
+        <RefreshCw size={28} className="text-gray-300 mx-auto mb-3" />
+        <p className="text-sm font-medium text-gray-400">No completed matches yet</p>
+        <p className="text-xs text-gray-300 mt-1">Standings will appear here once results are recorded.</p>
+      </div>
     );
   }
 
-  const cols: { key: keyof StandingRow; label: string; title: string }[] = [
-    { key: "gp", label: "GP", title: "Games Played" },
-    { key: "w",  label: "W",  title: "Wins" },
-    { key: "d",  label: "D",  title: "Draws" },
-    { key: "l",  label: "L",  title: "Losses" },
-    { key: "gf", label: "GF", title: "Goals For" },
-    { key: "ga", label: "GA", title: "Goals Against" },
-    { key: "gd", label: "GD", title: "Goal Difference" },
-    { key: "pts", label: "PTS", title: "Points" },
-  ];
-
   return (
-    <div className="overflow-x-auto rounded-xl shadow-sm" style={{ border: "1px solid #e2e8f0" }}>
-      <table className="w-full min-w-[520px]">
+    <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
+      <table className="w-full min-w-[560px] text-sm">
         <thead>
-          <tr style={{ backgroundColor: "#F9FAFB" }}>
-            <th
-              className="px-4 py-3 text-left"
-              style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 600, color: "#718096", textTransform: "uppercase", whiteSpace: "nowrap" }}
-            >
-              #
-            </th>
-            <th
-              className="px-4 py-3 text-left"
-              style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 600, color: "#718096", textTransform: "uppercase" }}
-            >
-              Team
-            </th>
-            {cols.map((c) => (
+          <tr className="bg-gray-50 border-b border-gray-100">
+            <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">#</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Team</th>
+            {COLS.map((c) => (
               <th
                 key={c.key}
                 title={c.title}
-                className="px-3 py-3 text-center"
-                style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 600, color: "#718096", textTransform: "uppercase", whiteSpace: "nowrap", cursor: "help" }}
+                className={`px-3 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap cursor-help ${c.hide ? "hidden sm:table-cell" : ""}`}
               >
                 {c.label}
               </th>
@@ -63,59 +57,66 @@ function StandingsTable({ rows }: { rows: StandingRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, idx) => (
-            <tr
-              key={row.teamId}
-              className="border-t"
-              style={{
-                borderColor: "#e2e8f0",
-                backgroundColor: idx % 2 === 0 ? "#ffffff" : "#fafafa",
-              }}
-            >
-              <td className="px-4 py-3 text-center">
-                {idx === 0 ? (
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-amber-100 text-amber-700">1</span>
-                ) : idx === 1 ? (
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-gray-100 text-gray-600">2</span>
-                ) : idx === 2 ? (
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-orange-50 text-orange-600">3</span>
-                ) : (
-                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "13px", color: "#9ca3af" }}>{idx + 1}</span>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "14px",
-                    fontWeight: idx === 0 ? 700 : 500,
-                    color: "#1a1a1a",
-                  }}
-                >
-                  {row.teamName}
-                </span>
-              </td>
-              {cols.map((c) => (
-                <td key={c.key} className="px-3 py-3 text-center">
-                  <span
-                    style={{
-                      fontFamily: "Inter, sans-serif",
-                      fontSize: "14px",
-                      fontWeight: c.key === "pts" ? 700 : 400,
-                      color: c.key === "pts" ? "#1a1a1a" : c.key === "gd" && (row[c.key] as number) > 0 ? "#10B981" : c.key === "gd" && (row[c.key] as number) < 0 ? "#EF4444" : "#4a5568",
-                    }}
-                  >
-                    {c.key === "gd" && (row[c.key] as number) > 0 ? `+${row[c.key]}` : row[c.key]}
+          {rows.map((row, idx) => {
+            const pos = POSITION_STYLE[idx] ?? null;
+            return (
+              <tr
+                key={row.teamId}
+                className={`border-b border-gray-50 last:border-0 transition-colors hover:bg-gray-50/80 ${idx < 3 ? pos!.bg : ""}`}
+                style={pos ? { borderLeft: `3px solid ${pos.ring}` } : { borderLeft: "3px solid transparent" }}
+              >
+                {/* Position */}
+                <td className="px-4 py-3.5 text-center">
+                  {idx < 3 ? (
+                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${pos!.badge}`}>
+                      {idx + 1}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-400 tabular-nums">{idx + 1}</span>
+                  )}
+                </td>
+
+                {/* Team name */}
+                <td className="px-4 py-3.5">
+                  <span className={`font-semibold tracking-tight ${idx === 0 ? "text-gray-900 text-[15px]" : "text-gray-700"}`}>
+                    {row.teamName}
                   </span>
                 </td>
-              ))}
-            </tr>
-          ))}
+
+                {/* Stats */}
+                {COLS.map((c) => {
+                  const val = row[c.key] as number;
+                  const isGd = c.key === "gd";
+                  const isPts = c.key === "pts";
+                  return (
+                    <td
+                      key={c.key}
+                      className={`px-3 py-3.5 text-center tabular-nums ${c.hide ? "hidden sm:table-cell" : ""}`}
+                    >
+                      {isPts ? (
+                        <span className="inline-flex items-center justify-center min-w-[32px] h-7 rounded-lg bg-gray-900 text-white text-xs font-bold px-2">
+                          {val}
+                        </span>
+                      ) : isGd ? (
+                        <span className={`text-sm font-semibold ${val > 0 ? "text-emerald-600" : val < 0 ? "text-red-500" : "text-gray-400"}`}>
+                          {val > 0 ? `+${val}` : val}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-600">{val}</span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
 }
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function StandingsPage() {
   const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
@@ -130,67 +131,38 @@ export default function StandingsPage() {
       ? (leagues?.find((l) => l.id === selectedLeagueId) ?? null)
       : (leagues?.[0] ?? null);
 
-  const { data: standings, isLoading: standingsLoading } = useQuery({
+  const { data: standings, isLoading: standingsLoading, dataUpdatedAt } = useQuery({
     queryKey: ["standings", activeLeague?.id],
     queryFn: () => leaguesApi.getStandings(activeLeague!.id),
     enabled: !!activeLeague,
     refetchInterval: 60_000,
   });
 
+  const lastUpdated = dataUpdatedAt
+    ? new Date(dataUpdatedAt).toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit" })
+    : null;
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <SoccerHero
-        logo="KDS Soccer"
-        navigation={NAV}
         title="Standings"
         subtitle="League tables updated after every completed match"
-        className="min-h-[44vh]"
-      >
-        <div className="w-full max-w-3xl mx-auto px-6 py-10 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(32px, 5vw, 52px)",
-              color: "#1a1a1a",
-              marginBottom: "12px",
-            }}
-          >
-            League Standings
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 }}
-            style={{ fontFamily: "Inter, sans-serif", fontSize: "17px", color: "#4a5568" }}
-          >
-            Points · Goals · Win/Draw/Loss
-          </motion.p>
-        </div>
-      </SoccerHero>
+      />
 
-      <section className="py-10 lg:py-16">
-        <div className="container mx-auto px-6 lg:px-16">
+      <section className="py-10 lg:py-14">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* League selector tabs */}
           {leaguesLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-800" />
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900" />
             </div>
           ) : !leagues || leagues.length === 0 ? (
-            <div
-              className="rounded-xl p-10 text-center"
-              style={{ border: "1px dashed #e2e8f0" }}
-            >
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", color: "#9ca3af" }}>
-                No leagues have been created yet.
-              </p>
+            <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-2xl">
+              <p className="text-gray-400 text-sm">No leagues have been created yet.</p>
             </div>
           ) : (
             <>
-              {/* Tabs */}
+              {/* League selector */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {leagues.map((league) => {
                   const active = (activeLeague?.id ?? leagues[0]?.id) === league.id;
@@ -198,23 +170,15 @@ export default function StandingsPage() {
                     <button
                       key={league.id}
                       onClick={() => setSelectedLeagueId(league.id)}
-                      style={{
-                        padding: "8px 18px",
-                        borderRadius: "100px",
-                        border: "1.5px solid",
-                        borderColor: active ? "#1a1a1a" : "#e5e7eb",
-                        background: active ? "#1a1a1a" : "transparent",
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "13px",
-                        fontWeight: 500,
-                        color: active ? "#ffffff" : "#4a5568",
-                        cursor: "pointer",
-                        transition: "all 0.15s",
-                      }}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+                        active
+                          ? "bg-gray-900 border-gray-900 text-white shadow-md"
+                          : "bg-white border-gray-200 text-gray-600 hover:border-gray-400"
+                      }`}
                     >
                       {league.name}
                       {league.division && (
-                        <span style={{ opacity: 0.7, marginLeft: "6px", fontSize: "11px" }}>
+                        <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-semibold ${active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"}`}>
                           {league.division}
                         </span>
                       )}
@@ -223,66 +187,55 @@ export default function StandingsPage() {
                 })}
               </div>
 
-              {/* Stats legend */}
-              <div className="flex flex-wrap gap-4 mb-6">
-                {[
-                  { abbr: "GP", full: "Games Played" },
-                  { abbr: "W", full: "Wins" },
-                  { abbr: "D", full: "Draws" },
-                  { abbr: "L", full: "Losses" },
-                  { abbr: "GF", full: "Goals For" },
-                  { abbr: "GA", full: "Goals Against" },
-                  { abbr: "GD", full: "Goal Difference" },
-                  { abbr: "PTS", full: "Points" },
-                ].map(({ abbr, full }) => (
-                  <span key={abbr} style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
-                    <strong style={{ color: "#4a5568" }}>{abbr}</strong> = {full}
-                  </span>
-                ))}
-              </div>
-
-              {/* Table */}
+              {/* Table area */}
               {standingsLoading ? (
                 <div className="flex items-center justify-center py-20">
-                  <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-800" />
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900" />
                 </div>
               ) : (
-                <motion.div
-                  key={activeLeague?.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  {activeLeague && (
-                    <div className="mb-4 flex items-baseline gap-3">
-                      <h2
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "22px",
-                          color: "#1a1a1a",
-                        }}
-                      >
-                        {activeLeague.name}
-                      </h2>
-                      {activeLeague.division && (
-                        <span
-                          className="px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ backgroundColor: "#E8F0FF", color: "#3B82F6", fontFamily: "Inter, sans-serif" }}
-                        >
-                          {activeLeague.division}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeLeague?.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Table header row */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                          {activeLeague?.name}
+                        </h2>
+                        {activeLeague?.division && (
+                          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+                            {activeLeague.division}
+                          </span>
+                        )}
+                      </div>
+                      {lastUpdated && (
+                        <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Updated {lastUpdated}
                         </span>
                       )}
                     </div>
-                  )}
-                  <StandingsTable rows={standings ?? []} />
 
-                  <p
-                    className="mt-3 text-right"
-                    style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}
-                  >
-                    W = 3 pts · D = 1 pt · L = 0 pts · Auto-refreshes every 60s
-                  </p>
-                </motion.div>
+                    <StandingsTable rows={standings ?? []} />
+
+                    {/* Legend */}
+                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                      <div className="flex flex-wrap gap-3">
+                        {COLS.map(({ label, title }) => (
+                          <span key={label} className="text-xs text-gray-400">
+                            <strong className="text-gray-500 font-semibold">{label}</strong> {title}
+                          </span>
+                        ))}
+                      </div>
+                      <span className="ml-auto text-xs text-gray-400">W = 3 pts · D = 1 pt · L = 0 pts</span>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               )}
             </>
           )}

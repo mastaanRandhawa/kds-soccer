@@ -38,11 +38,11 @@ const STATUS_META: Record<string, { label: string; color: string; dot: string }>
   COMPLETED:  { label: 'Final',    color: 'bg-gray-100 text-gray-500',     dot: 'bg-gray-400' },
 }
 
-// Division accent colours
-const DIV_COLORS: Record<number, { header: string; badge: string; group: string; ring: string }> = {
-  0: { header: 'from-amber-600  to-amber-400',  badge: 'bg-amber-100  text-amber-800',  group: 'border-amber-200  bg-amber-50/40',  ring: 'ring-amber-200' },
-  1: { header: 'from-blue-700   to-blue-500',   badge: 'bg-blue-100   text-blue-800',   group: 'border-blue-200   bg-blue-50/40',   ring: 'ring-blue-200' },
-  2: { header: 'from-emerald-600 to-emerald-400', badge: 'bg-emerald-100 text-emerald-800', group: 'border-emerald-200 bg-emerald-50/40', ring: 'ring-emerald-200' },
+// Division accent colours — understated palette
+const DIV_COLORS: Record<number, { dot: string; badge: string; group: string; ring: string }> = {
+  0: { dot: 'bg-blue-500',    badge: 'bg-blue-50    text-blue-700',    group: 'border-gray-100 bg-white',    ring: 'ring-gray-100' },
+  1: { dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700', group: 'border-gray-100 bg-white',    ring: 'ring-gray-100' },
+  2: { dot: 'bg-amber-500',   badge: 'bg-amber-50   text-amber-700',   group: 'border-gray-100 bg-white',    ring: 'ring-gray-100' },
 }
 function divColor(idx: number) { return DIV_COLORS[idx % 3] }
 
@@ -77,42 +77,40 @@ function MatchRow({ match }: { match: Match }) {
   const away = teamName(match, 'away')
 
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50/60 transition-colors">
-      <td className="px-4 py-3 text-center">
+    <tr className="border-b border-gray-50 last:border-0 hover:bg-gray-50/70 transition-colors group">
+      <td className="pl-4 pr-2 py-3 text-center w-10">
         {match.gameNumber != null && (
-          <span className="inline-block w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-xs font-bold leading-7 text-center">
-            {match.gameNumber}
-          </span>
+          <span className="text-xs font-mono text-gray-400 tabular-nums">#{match.gameNumber}</span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+      <td className="px-3 py-3 whitespace-nowrap">
         {match.matchDate ? (
-          <>
-            <div className="font-medium text-gray-700">{fmtDay(match.matchDate)}</div>
-            <div>{fmtShortDate(match.matchDate)}</div>
-          </>
-        ) : '—'}
+          <div>
+            <div className="text-xs font-semibold text-gray-700">{fmtDay(match.matchDate)}</div>
+            <div className="text-xs text-gray-400">{fmtShortDate(match.matchDate)}</div>
+          </div>
+        ) : <span className="text-xs text-gray-300">—</span>}
       </td>
-      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+      <td className="px-3 py-3 text-xs text-gray-500 whitespace-nowrap tabular-nums">
         {match.matchDate ? fmtTime(match.matchDate) : '—'}
       </td>
-      <td className="px-4 py-3 text-right">
-        <span className={`font-medium text-sm ${homeIsPlaceholder ? 'text-gray-400 italic' : 'text-gray-900'}`}>
+      <td className="px-3 py-3 text-right min-w-[120px]">
+        <span className={`text-sm font-semibold tracking-tight ${homeIsPlaceholder ? 'text-gray-400 italic font-normal' : 'text-gray-900'}`}>
           {home}
         </span>
       </td>
-      <td className="px-3 py-3 text-center">
+      <td className="px-2 py-3 text-center w-20">
         <ScoreDisplay match={match} />
       </td>
-      <td className="px-4 py-3 text-left">
-        <span className={`font-medium text-sm ${awayIsPlaceholder ? 'text-gray-400 italic' : 'text-gray-900'}`}>
+      <td className="px-3 py-3 text-left min-w-[120px]">
+        <span className={`text-sm font-semibold tracking-tight ${awayIsPlaceholder ? 'text-gray-400 italic font-normal' : 'text-gray-900'}`}>
           {away}
         </span>
       </td>
-      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap hidden lg:table-cell">
-        {match.field ?? '—'}
+      <td className="px-3 py-3 text-xs text-gray-400 whitespace-nowrap hidden lg:table-cell">
+        {match.field ?? ''}
       </td>
-      <td className="px-4 py-3">
+      <td className="pr-4 pl-2 py-3">
         <StatusBadge status={match.status} />
       </td>
     </tr>
@@ -173,15 +171,15 @@ function MatchCard({ match }: { match: Match }) {
 }
 
 // Match table with desktop/mobile switch
-function MatchList({ matches, title, accentClass }: { matches: Match[]; title?: string; accentClass?: string }) {
+function MatchList({ matches, title }: { matches: Match[]; title?: string }) {
   if (matches.length === 0) return null
   return (
     <div>
       {title && (
-        <div className={`flex items-center gap-2 mb-3`}>
-          <span className={`h-0.5 flex-1 ${accentClass ?? 'bg-gray-200'}`} />
-          <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{title}</span>
-          <span className={`h-0.5 flex-1 ${accentClass ?? 'bg-gray-200'}`} />
+        <div className="flex items-center gap-3 mb-3 mt-4">
+          <span className="h-px flex-1 bg-gray-100" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">{title}</span>
+          <span className="h-px flex-1 bg-gray-100" />
         </div>
       )}
 
@@ -189,15 +187,15 @@ function MatchList({ matches, title, accentClass }: { matches: Match[]; title?: 
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-400">
-              <th className="px-4 py-2 text-center w-10">#</th>
-              <th className="px-4 py-2 text-left">Day</th>
-              <th className="px-4 py-2 text-left">Time</th>
-              <th className="px-4 py-2 text-right">Home</th>
-              <th className="px-3 py-2 text-center w-20">Score</th>
-              <th className="px-4 py-2 text-left">Away</th>
-              <th className="px-4 py-2 text-left hidden lg:table-cell">Field</th>
-              <th className="px-4 py-2 text-left">Status</th>
+            <tr className="border-b border-gray-100">
+              <th className="pl-4 pr-2 py-2 text-left w-10 text-[10px] font-semibold uppercase tracking-wider text-gray-400">#</th>
+              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400">Day</th>
+              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400">Time</th>
+              <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wider text-gray-400">Home</th>
+              <th className="px-2 py-2 text-center w-20 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Score</th>
+              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400">Away</th>
+              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400 hidden lg:table-cell">Field</th>
+              <th className="pr-4 pl-2 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -207,7 +205,7 @@ function MatchList({ matches, title, accentClass }: { matches: Match[]; title?: 
       </div>
 
       {/* Mobile cards */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-2.5">
         {matches.map((m) => <MatchCard key={m.id} match={m} />)}
       </div>
     </div>
@@ -224,7 +222,6 @@ function GroupSection({
   matches: Match[]
   colorClass: ReturnType<typeof divColor>
 }) {
-  // Derive unique teams for this group (skip placeholders)
   const teams = useMemo(() => {
     const seen = new Map<string, string>()
     matches.forEach((m) => {
@@ -235,18 +232,23 @@ function GroupSection({
   }, [matches])
 
   return (
-    <div className={`rounded-2xl border ${colorClass.group} ${colorClass.ring} ring-1 overflow-hidden`}>
+    <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
       {/* Group header */}
-      <div className="px-5 py-3 border-b border-current/10 flex items-center justify-between bg-white/60">
-        <h3 className="font-bold text-gray-800 text-sm">{name}</h3>
-        <span className="text-xs text-gray-400">{matches.length} match{matches.length !== 1 ? 'es' : ''}</span>
+      <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className={`w-2 h-2 rounded-full ${colorClass.dot}`} />
+          <h3 className="font-bold text-gray-800 text-sm tracking-tight">{name}</h3>
+          <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">
+            {matches.length} matches
+          </span>
+        </div>
       </div>
 
       {/* Team pills */}
       {teams.length > 0 && (
-        <div className="px-5 py-3 flex flex-wrap gap-2 border-b border-current/10 bg-white/40">
+        <div className="px-5 py-2.5 flex flex-wrap gap-1.5 border-b border-gray-50 bg-gray-50/50">
           {teams.map((n) => (
-            <span key={n} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-600 shadow-sm">
+            <span key={n} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-gray-100 text-gray-600 shadow-sm">
               {n}
             </span>
           ))}
@@ -254,7 +256,7 @@ function GroupSection({
       )}
 
       {/* Matches */}
-      <div className="p-4">
+      <div className="px-1 pb-2">
         <MatchList matches={matches} />
       </div>
     </div>
@@ -291,39 +293,41 @@ function DivisionSection({
   )
 
   return (
-    <section className="space-y-5">
-      {/* Division header */}
-      <div className={`rounded-2xl bg-gradient-to-r ${color.header} p-5 shadow-md`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-black text-white tracking-tight">{league.name}</h2>
-            {league.division && (
-              <span className="text-white/70 text-sm">{league.division}</span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              {leagueMatches.length} Matches
+    <section className="space-y-4">
+      {/* Division header — clean dark bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-gray-900">
+        <div className="flex items-center gap-3">
+          <span className={`w-3 h-3 rounded-full shrink-0 ${color.dot}`} />
+          <h2 className="text-xl font-black text-gray-900 tracking-tight">{league.name}</h2>
+          {league.division && (
+            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${color.badge}`}>
+              {league.division}
             </span>
-            {groups.length > 0 && (
-              <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                {groups.length} Groups
-              </span>
-            )}
-          </div>
+          )}
         </div>
-        {league.notes && (
-          <p className="mt-2 text-white/70 text-xs leading-relaxed">{league.notes}</p>
-        )}
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span className="bg-gray-100 px-2.5 py-1 rounded-full font-medium">{leagueMatches.length} matches</span>
+          {groups.length > 0 && (
+            <span className="bg-gray-100 px-2.5 py-1 rounded-full font-medium">{groups.length} groups</span>
+          )}
+        </div>
       </div>
+
+      {league.notes && (
+        <p className="text-xs text-gray-400 leading-relaxed -mt-2 pl-6">{league.notes}</p>
+      )}
 
       {/* Ungrouped pool play (Over 52) */}
       {ungroupedGroupStage.length > 0 && (
-        <div className={`rounded-2xl border ${color.group} ${color.ring} ring-1 overflow-hidden`}>
-          <div className="px-5 py-3 bg-white/60 border-b border-current/10">
-            <h3 className="font-bold text-gray-800 text-sm">Pool Play</h3>
+        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2.5">
+            <span className={`w-2 h-2 rounded-full ${color.dot}`} />
+            <h3 className="font-bold text-gray-800 text-sm tracking-tight">Pool Play</h3>
+            <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">
+              {ungroupedGroupStage.length} matches
+            </span>
           </div>
-          <div className="p-4">
+          <div className="px-1 pb-2">
             <MatchList matches={ungroupedGroupStage.sort((a, b) => (a.gameNumber ?? 0) - (b.gameNumber ?? 0))} />
           </div>
         </div>
@@ -331,7 +335,7 @@ function DivisionSection({
 
       {/* Groups */}
       {groups.length > 0 && (
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           {groups.map((group) => {
             const gMatches = leagueMatches
               .filter((m) => m.groupId === group.id)
@@ -345,11 +349,12 @@ function DivisionSection({
 
       {/* Knockout rounds */}
       {knockoutMatches.length > 0 && (
-        <div className={`rounded-2xl border ${color.group} ${color.ring} ring-1 overflow-hidden`}>
-          <div className="px-5 py-3 bg-white/60 border-b border-current/10 flex items-center gap-2">
-            <h3 className="font-bold text-gray-800 text-sm">Knockout Rounds</h3>
+        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-gray-400" />
+            <h3 className="font-bold text-gray-800 text-sm tracking-tight">Knockout Rounds</h3>
           </div>
-          <div className="p-4 space-y-5">
+          <div className="px-1 pb-2">
             {other.length > 0 && (
               <MatchList matches={other.sort((a, b) => (a.gameNumber ?? 0) - (b.gameNumber ?? 0))} />
             )}
@@ -582,23 +587,24 @@ export default function SchedulePage() {
         onChange={setFilters}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-3">
         {/* Summary bar */}
-        <div className="flex flex-wrap items-center gap-4 pb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="font-semibold text-gray-800">{filteredMatches.length}</span> matches
+        <div className="flex flex-wrap items-center gap-3 pb-4 border-b border-gray-100">
+          <p className="text-sm text-gray-500">
+            <span className="font-bold text-gray-900 text-base">{filteredMatches.length}</span>
+            {" "}matches
             {(filters.division || filters.team || filters.status || filters.field || filters.day) && (
-              <span className="text-gray-400">(filtered)</span>
+              <span className="text-gray-400 ml-1">· filtered</span>
             )}
-          </div>
+          </p>
           {liveCount > 0 && (
-            <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full border border-green-100">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               {liveCount} Live Now
             </span>
           )}
-          <span className="ml-auto text-xs text-gray-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Auto-refresh 30s
+          <span className="ml-auto text-xs text-gray-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse" /> Auto-refresh 30s
           </span>
         </div>
 
