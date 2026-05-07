@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = 'https://kds-soccer-rar3.onrender.com/api'
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
