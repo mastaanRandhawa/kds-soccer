@@ -4,6 +4,7 @@ import HomePage from '@/pages/Home'
 import BracketPage from '@/pages/Bracket'
 import StandingsPage from '@/pages/Standings'
 import SchedulePage from '@/pages/Schedule'
+import KidsSchedulePage from '@/pages/KidsSchedule'
 import AdminLogin from '@/pages/admin/Login'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminTeams from '@/pages/admin/Teams'
@@ -30,6 +31,7 @@ function App() {
       <Route path="/standings" element={<StandingsPage />} />
       <Route path="/schedule" element={<SchedulePage />} />
       <Route path="/bracket" element={<BracketPage />} />
+      <Route path="/kids-schedule" element={<KidsSchedulePage />} />
 
       {/* Admin */}
       <Route path="/admin/login" element={<AdminLogin />} />

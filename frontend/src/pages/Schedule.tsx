@@ -417,7 +417,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none bg-transparent text-sm font-medium pr-5 focus:outline-none w-full truncate"
+        className="appearance-none bg-transparent text-sm font-medium pr-5 focus:outline-none w-full truncate [&>option]:bg-white [&>option]:text-gray-900"
         style={{ color: active ? '#fff' : '#374151', cursor: 'pointer' }}
       >
         {children}

@@ -8,10 +8,11 @@ export const Footer = ({
   copyright = "© 2026 KDS Soccer Tournament. All rights reserved.",
 }: FooterProps) => {
   const quickLinks = [
-    { name: "Home",      href: resolvePublicPath("/") },
-    { name: "Schedule",  href: resolvePublicPath("/schedule") },
-    { name: "Standings", href: resolvePublicPath("/standings") },
-    { name: "Bracket",   href: resolvePublicPath("/bracket") },
+    { name: "Home",          href: resolvePublicPath("/") },
+    { name: "Schedule",      href: resolvePublicPath("/schedule") },
+    { name: "Kids Schedule", href: resolvePublicPath("/kids-schedule") },
+    { name: "Standings",     href: resolvePublicPath("/standings") },
+    { name: "Bracket",       href: resolvePublicPath("/bracket") },
   ];
 
   return (
@@ -86,8 +87,21 @@ export const Footer = ({
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-gray-800 flex items-center justify-between gap-4">
-          <p className="text-xs text-gray-600">{copyright}</p>
+        <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-gray-600">{copyright}</p>
+            <p className="text-xs text-gray-600">
+              Created by{' '}
+              <a
+                href="https://mastaanrandhawa.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors underline underline-offset-2"
+              >
+                Mastaan Randhawa
+              </a>
+            </p>
+          </div>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span className="text-xs text-gray-600">All systems live</span>

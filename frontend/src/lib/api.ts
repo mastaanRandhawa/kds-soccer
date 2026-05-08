@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'https://kds-soccer-rar3.onrender.com/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,8 +20,14 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status
+    const msg = error.response?.data?.error as string | undefined
+    const authFailed =
+      status === 401 ||
+      (status === 403 && msg === 'Invalid or expired token')
+    if (authFailed) {
       localStorage.removeItem('token')
+      localStorage.removeItem('auth-storage')
       window.location.href = `${import.meta.env.BASE_URL}admin/login`
     }
     return Promise.reject(error)

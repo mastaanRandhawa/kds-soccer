@@ -9,7 +9,8 @@ import { matchesApi, leaguesApi, League } from "@/lib/api";
 
 const NAV = [
   { label: "Home", href: "/" },
-  { label: "Live Scores", href: "/live-scores" },
+  { label: "Schedule", href: "/schedule" },
+  { label: "Kids Schedule", href: "/kids-schedule" },
   { label: "Standings", href: "/standings" },
   { label: "Bracket", href: "/bracket" },
   { label: "UFSA Rules", href: "https://usfa.ca/", external: true },

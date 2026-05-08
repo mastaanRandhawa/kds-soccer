@@ -74,6 +74,7 @@ export default function HomePage() {
         navigation={[
           { label: "Home", href: "/" },
           { label: "Schedule", href: "/schedule" },
+          { label: "Kids Schedule", href: "/kids-schedule" },
           { label: "Standings", href: "/standings" },
           { label: "Bracket", href: "/bracket" },
           { label: "UFSA Rules", href: "https://usfa.ca/", external: true },
