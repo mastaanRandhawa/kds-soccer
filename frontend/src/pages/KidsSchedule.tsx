@@ -51,12 +51,15 @@ export default function KidsSchedulePage() {
           <div className="text-center py-24 space-y-4">
             <p className="text-lg font-bold text-gray-800">No PDF yet</p>
             <p className="text-sm text-gray-500 max-w-md mx-auto">
-              Put your file at{' '}
-              <code className="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded text-xs">
+              The file must live under the <strong className="text-gray-700">public</strong> folder (so the build copies it):
+              <br />
+              <code className="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded text-xs mt-2 inline-block">
                 frontend/public/kids-schedule/kids.pdf
               </code>
-              , <strong className="text-gray-700">commit it to git</strong> (otherwise deploy won’t ship it),
-              then push — GitHub Actions will rebuild the site.
+              <br />
+              <span className="text-gray-400 text-xs mt-2 block">
+                Not next to <code className="text-gray-500">src/</code> and not <code className="text-gray-500">kids-schdule/</code> (typo) — only <code className="text-gray-500">public/kids-schedule/</code>.
+              </span>
             </p>
           </div>
         ) : (

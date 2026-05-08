@@ -1,13 +1,14 @@
 Kids schedule (PDF)
 ===================
 
-Put your PDF here as:
+Put your PDF HERE (inside public), exact name:
 
-  kids.pdf
+  public/kids-schedule/kids.pdf
 
-The Kids Schedule page embeds this file.
+Wrong places (will NOT work):
+  - frontend/kids-schdule/   ← typo "schdule", and not under public/
+  - anywhere except public/kids-schedule/kids.pdf
 
-IMPORTANT: Add kids.pdf to GIT and push. If the file is only on your laptop
-and not committed, the deployed site will NOT have it — the page will 404.
+Vite only copies the "public/" folder into the site root when you build.
 
-Commit → build → deploy (e.g. GitHub Actions / GitHub Pages).
+Commit kids.pdf → push → GitHub Actions rebuilds the site.
