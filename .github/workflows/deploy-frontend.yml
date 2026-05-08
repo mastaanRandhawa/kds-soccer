@@ -32,8 +32,8 @@ jobs:
         working-directory: frontend
         run: npm ci && npm run build
         env:
-          VITE_API_URL: https://kds-soccer.onrender.com/api
-          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_API_URL: https://kds-soccer-rar3.onrender.com/api
+          VITE_BASE_PATH: /
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
