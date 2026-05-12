@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { resolvePublicPath } from "@/lib/public-path";
 
@@ -41,6 +41,11 @@ interface SoccerHeroProps {
   children?: React.ReactNode;
 }
 
+const CARD_W = 340;
+const CARD_GAP = 24;
+const STRIDE = CARD_W + CARD_GAP; // 364 px per card slot
+const SPEED = 0.05; // px per ms
+
 export function SoccerHero({
   logo = "KDS Soccer",
   navigation = [
@@ -63,10 +68,64 @@ export function SoccerHero({
 }: SoccerHeroProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
+  // ── Carousel state ──────────────────────────────────────────────────────────
+  const carouselX = useMotionValue(0);
+  const totalWidth = matches.length * STRIDE;
+  const isDragging = React.useRef(false);
+  const isHovered = React.useRef(false);
+  const rafRef = React.useRef<number | null>(null);
+  const lastTimeRef = React.useRef<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (matches.length === 0 || totalWidth === 0) return;
+
+    const tick = (time: number) => {
+      if (!isDragging.current && !isHovered.current) {
+        if (lastTimeRef.current !== undefined) {
+          let nx = carouselX.get() - SPEED * (time - lastTimeRef.current);
+          // Wrap seamlessly using the duplicated-array technique
+          if (nx <= -totalWidth) nx += totalWidth;
+          if (nx > 0) nx -= totalWidth;
+          carouselX.set(nx);
+        }
+        lastTimeRef.current = time;
+      } else {
+        // Reset timestamp so there's no jump on resume
+        lastTimeRef.current = undefined;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [matches.length, totalWidth, carouselX]);
+
+  const pauseCarousel = () => {
+    isHovered.current = true;
+  };
+
+  const resumeCarousel = () => {
+    isHovered.current = false;
+  };
+
+  const onDragEnd = () => {
+    isDragging.current = false;
+    // Normalise x back into the [-totalWidth, 0] window
+    let nx = carouselX.get();
+    while (nx < -totalWidth) nx += totalWidth;
+    while (nx > 0) nx -= totalWidth;
+    carouselX.set(nx);
+  };
+
+  const isFullHero = matches.length > 0;
+
   return (
     <section
       className={cn(
-        "relative w-full min-h-screen flex flex-col overflow-hidden",
+        "relative w-full flex flex-col overflow-hidden",
+        isFullHero ? "min-h-screen" : "min-h-[280px] sm:min-h-[360px]",
         className
       )}
       style={{
@@ -75,6 +134,64 @@ export function SoccerHero({
       role="banner"
       aria-label="Hero section"
     >
+      {/* ── Decorative background orbs ─────────────────────────────────────── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        {/* Top-right green orb */}
+        <div
+          style={{
+            position: "absolute",
+            top: "-120px",
+            right: "-100px",
+            width: "520px",
+            height: "520px",
+            background: "radial-gradient(circle, rgba(16,185,129,0.13) 0%, transparent 68%)",
+            borderRadius: "50%",
+          }}
+        />
+        {/* Bottom-left blue orb */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: isFullHero ? "200px" : "-80px",
+            left: "-100px",
+            width: "560px",
+            height: "560px",
+            background: "radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 68%)",
+            borderRadius: "50%",
+          }}
+        />
+        {/* Centre accent orb */}
+        <div
+          style={{
+            position: "absolute",
+            top: "40%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "700px",
+            height: "350px",
+            background: "radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 70%)",
+          }}
+        />
+        {/* Subtle field-circle SVG watermark */}
+        <svg
+          viewBox="0 0 400 400"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            position: "absolute",
+            bottom: isFullHero ? "160px" : "-30px",
+            right: isFullHero ? "8%" : "4%",
+            width: "clamp(200px, 30vw, 380px)",
+            opacity: 0.045,
+            pointerEvents: "none",
+          }}
+        >
+          <circle cx="200" cy="200" r="190" stroke="#1a1a1a" strokeWidth="8" />
+          <circle cx="200" cy="200" r="48" stroke="#1a1a1a" strokeWidth="8" />
+          <line x1="200" y1="10" x2="200" y2="390" stroke="#1a1a1a" strokeWidth="8" />
+        </svg>
+      </div>
+
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -83,15 +200,17 @@ export function SoccerHero({
         className="relative z-20 flex flex-row justify-between items-center px-6 lg:px-16"
         style={{ paddingTop: "28px", paddingBottom: "28px" }}
       >
-        {/* Logo */}
+        {/* Logo — top-left, Oswald, uppercase, responsive */}
         <a
           href={resolvePublicPath("/")}
           style={{
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "'Oswald', sans-serif",
             fontWeight: 700,
-            fontSize: "22px",
+            fontSize: "clamp(18px, 2.4vw, 28px)",
             color: "#1a1a1a",
             textDecoration: "none",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
           }}
         >
           {logo}
@@ -325,23 +444,44 @@ export function SoccerHero({
           className="relative z-10 w-full overflow-hidden"
           style={{ paddingTop: "48px", paddingBottom: "60px" }}
         >
-          {/* Edge fade overlays */}
+          {/*
+            Edge fade overlays — narrower on mobile so images aren't obscured.
+            Tailwind: w-8 (32px) → sm:w-16 (64px) → md:w-[120px]
+          */}
           <div
-            className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
-            style={{ width: "120px", background: "linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)" }}
+            className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none w-8 sm:w-16 md:w-[120px]"
+            style={{ background: "linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)" }}
           />
           <div
-            className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none"
-            style={{ width: "120px", background: "linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)" }}
+            className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none w-8 sm:w-16 md:w-[120px]"
+            style={{ background: "linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)" }}
           />
 
+          {/*
+            Carousel track — driven by a RAF loop (carouselX MotionValue).
+            • Hover (desktop): pauses the loop.
+            • Touch start/end: pauses and resumes.
+            • Drag: freeform manual scrub; position is normalised on release.
+          */}
           <motion.div
-            className="flex items-center"
-            animate={{ x: [0, -((matches.length * 380) / 2)] }}
-            transition={{
-              x: { repeat: Infinity, repeatType: "loop", duration: matches.length * 3, ease: "linear" },
+            style={{
+              x: carouselX,
+              display: "flex",
+              alignItems: "center",
+              gap: `${CARD_GAP}px`,
+              paddingLeft: `${CARD_GAP}px`,
+              cursor: "grab",
             }}
-            style={{ gap: "24px", paddingLeft: "24px" }}
+            drag="x"
+            dragMomentum={false}
+            dragElastic={0.05}
+            onDragStart={() => { isDragging.current = true; }}
+            onDragEnd={onDragEnd}
+            onMouseEnter={pauseCarousel}
+            onMouseLeave={resumeCarousel}
+            onTouchStart={pauseCarousel}
+            onTouchEnd={resumeCarousel}
+            whileTap={{ cursor: "grabbing" }}
           >
             {[...matches, ...matches].map((match, index) => (
               <motion.div
@@ -349,16 +489,49 @@ export function SoccerHero({
                 whileHover={{ scale: 1.04, y: -8 }}
                 transition={{ duration: 0.3 }}
                 onClick={match.onClick}
-                className="flex-shrink-0 cursor-pointer relative overflow-hidden"
-                style={{ width: "340px", height: "460px", borderRadius: "20px", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}
+                className="flex-shrink-0 relative overflow-hidden"
+                style={{
+                  width: `${CARD_W}px`,
+                  height: "460px",
+                  borderRadius: "20px",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                }}
               >
-                <img src={match.image} alt={match.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%)" }} />
-                <div className="absolute bottom-0 left-0 right-0 p-6" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", fontWeight: 500, color: "rgba(255,255,255,0.75)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                <img
+                  src={match.image}
+                  alt={match.title}
+                  draggable={false}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", userSelect: "none" }}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%)" }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 p-6"
+                  style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "11px",
+                      fontWeight: 500,
+                      color: "rgba(255,255,255,0.75)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
                     {match.category}
                   </span>
-                  <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", lineHeight: "1.3" }}>
+                  <h3
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "22px",
+                      fontWeight: 600,
+                      color: "#FFFFFF",
+                      lineHeight: "1.3",
+                    }}
+                  >
                     {match.title}
                   </h3>
                 </div>
