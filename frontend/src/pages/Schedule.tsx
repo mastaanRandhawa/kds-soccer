@@ -4,24 +4,7 @@ import { leaguesApi, matchesApi, type League, type Match } from '@/lib/api'
 import { SoccerHero } from '@/components/ui/soccer-hero'
 import { Footer } from '@/components/ui/footer'
 import { Layers, Calendar, MapPin, Search, CircleDot, X } from 'lucide-react'
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function fmtDate(d: string) {
-  const dt = new Date(d)
-  return dt.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' })
-}
-function fmtTime(d: string) {
-  const dt = new Date(d)
-  return dt.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', hour12: true })
-}
-function fmtDay(d: string) {
-  return new Date(d).toLocaleDateString('en-CA', { weekday: 'short' })
-}
-function fmtShortDate(d: string) {
-  const dt = new Date(d)
-  return `${dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}`
-}
+import { fmtDate, fmtTime, fmtDay, fmtShortDate } from '@/lib/utils'
 
 function teamName(match: Match, side: 'home' | 'away') {
   if (side === 'home') return match.homePlaceholder ?? match.team1?.name ?? 'TBD'

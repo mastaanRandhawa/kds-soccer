@@ -5,6 +5,7 @@ import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
 import { MatchTable } from "@/components/ui/match-table";
 import { matchesApi } from "@/lib/api";
+import { fmtLastUpdated } from "@/lib/utils";
 
 type MatchFilter = "all" | "live" | "upcoming" | "completed";
 
@@ -174,7 +175,7 @@ export default function LiveScoresPage() {
           <div className="flex items-center gap-2 mb-6">
             <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10B981", display: "inline-block", animation: "pulse 1.5s infinite" }} />
             <span style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
-              Auto-refreshing · Last updated {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}
+              Auto-refreshing · Last updated {dataUpdatedAt ? fmtLastUpdated(dataUpdatedAt) : "—"}
             </span>
           </div>
 

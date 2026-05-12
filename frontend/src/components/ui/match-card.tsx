@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { Match } from "@/lib/api";
+import { fmtDateTime } from "@/lib/utils";
 
 interface MatchCardProps {
   match: Match;
@@ -170,13 +171,7 @@ export function MatchCard({ match, showDate = true }: MatchCardProps) {
               color: "#718096",
             }}
           >
-            {new Date(match.matchDate).toLocaleDateString("en-US", {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {fmtDateTime(match.matchDate)}
           </span>
         </div>
       )}

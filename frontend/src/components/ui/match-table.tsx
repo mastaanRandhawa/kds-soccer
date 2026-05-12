@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { Match } from "@/lib/api";
+import { fmtShortDate, fmtTime } from "@/lib/utils";
 
 interface MatchTableProps {
   matches: Match[];
@@ -146,10 +147,10 @@ function DesktopRow({ match, idx }: { match: Match; idx: number }) {
         {match.matchDate ? (
           <div>
             <div style={{ fontFamily: "Inter, sans-serif", fontSize: "13px", fontWeight: 500, color: "#1a1a1a" }}>
-              {new Date(match.matchDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              {fmtShortDate(match.matchDate)}
             </div>
             <div style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
-              {new Date(match.matchDate).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+              {fmtTime(match.matchDate)}
             </div>
           </div>
         ) : (
@@ -234,9 +235,7 @@ function MobileCard({ match, idx }: { match: Match; idx: number }) {
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           {match.matchDate && (
             <span style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#9ca3af" }}>
-              {new Date(match.matchDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              {" "}
-              {new Date(match.matchDate).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+              {fmtShortDate(match.matchDate)} {fmtTime(match.matchDate)}
             </span>
           )}
           <StatusBadge status={match.status} />

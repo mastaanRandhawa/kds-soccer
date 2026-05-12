@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/auth";
 import { leaguesApi, matchesApi, groupsApi, teamsApi, Match, Group } from "@/lib/api";
+import { toLocalInputValue, fromLocalInputValue, fmtShortDate, fmtTime } from "@/lib/utils";
 import {
   ArrowLeft, Plus, Edit2, Trash2, Trophy, ChevronDown, ChevronUp,
   Layers, Calendar, Users, X, Zap, AlertCircle,
@@ -179,11 +180,7 @@ function MatchRow({
   const statusInfo = STATUSES.find((s) => s.value === match.status) ?? STATUSES[0];
 
   const dateStr = match.matchDate
-    ? new Date(match.matchDate).toLocaleDateString("en-CA", {
-        month: "short", day: "numeric",
-      }) + " " + new Date(match.matchDate).toLocaleTimeString("en-CA", {
-        hour: "2-digit", minute: "2-digit",
-      })
+    ? `${fmtShortDate(match.matchDate)} ${fmtTime(match.matchDate)}`
     : "–";
 
   return (
@@ -490,7 +487,7 @@ export default function AdminLeagueDetail() {
       useHomePlaceholder: !m.team1Id,
       useAwayPlaceholder: !m.team2Id,
       gameNumber: m.gameNumber != null ? String(m.gameNumber) : "",
-      matchDate: m.matchDate ? m.matchDate.slice(0, 16) : "",
+      matchDate: m.matchDate ? toLocalInputValue(m.matchDate) : "",
       field: m.field ?? "",
       status: m.status,
       notes: m.notes ?? "",
@@ -510,7 +507,7 @@ export default function AdminLeagueDetail() {
       round: form.round,
       groupId: form.groupId || null,
       gameNumber: form.gameNumber ? Number(form.gameNumber) : null,
-      matchDate: form.matchDate || null,
+      matchDate: form.matchDate ? fromLocalInputValue(form.matchDate) : null,
       field: form.field || null,
       status: form.status,
       notes: form.notes || null,

@@ -5,6 +5,7 @@ import { SoccerHero } from "@/components/ui/soccer-hero";
 import { Footer } from "@/components/ui/footer";
 import { leaguesApi, StandingRow, League } from "@/lib/api";
 import { RefreshCw } from "lucide-react";
+import { fmtLastUpdatedShort } from "@/lib/utils";
 
 // ─── Column definitions ──────────────────────────────────────────────────────
 
@@ -138,9 +139,7 @@ export default function StandingsPage() {
     refetchInterval: 60_000,
   });
 
-  const lastUpdated = dataUpdatedAt
-    ? new Date(dataUpdatedAt).toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit" })
-    : null;
+  const lastUpdated = dataUpdatedAt ? fmtLastUpdatedShort(dataUpdatedAt) : null;
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { Match } from "@/lib/api";
+import { fmtShortDate } from "@/lib/utils";
 
 interface BracketProps {
   quarterfinals: Match[];
@@ -357,7 +358,7 @@ function BracketCard({
           </span>
           {match.matchDate && (
             <span style={{ fontFamily: "Inter, sans-serif", fontSize: "10px", color: "#9ca3af" }}>
-              {new Date(match.matchDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              {fmtShortDate(match.matchDate)}
             </span>
           )}
         </div>

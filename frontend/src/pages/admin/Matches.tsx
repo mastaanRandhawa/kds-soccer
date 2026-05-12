@@ -7,6 +7,7 @@ import { matchesApi, teamsApi, Match } from "@/lib/api";
 import { ArrowLeft, Plus, Edit2, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/ui/admin-header";
 import { leaguesApi } from "@/lib/api";
+import { toLocalInputValue, fromLocalInputValue } from "@/lib/utils";
 
 const ROUNDS = [
   "GROUP_STAGE",
@@ -98,9 +99,7 @@ export default function AdminMatches() {
         score2: match.score2,
         round: match.round,
         status: match.status,
-        matchDate: match.matchDate
-          ? new Date(match.matchDate).toISOString().slice(0, 16)
-          : "",
+        matchDate: match.matchDate ? toLocalInputValue(match.matchDate) : "",
         leagueId: match.leagueId ?? "",
       });
     } else {
@@ -128,7 +127,7 @@ export default function AdminMatches() {
     e.preventDefault();
     const data = {
       ...formData,
-      matchDate: formData.matchDate || undefined,
+      matchDate: formData.matchDate ? fromLocalInputValue(formData.matchDate) : undefined,
     };
 
     if (editingMatch) {
